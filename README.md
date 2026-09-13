@@ -13,6 +13,10 @@ See [plan.md](plan.md) for the architecture, the CNA API coverage analysis, and 
 [plan20260727.md](plan20260727.md) is the archived previous plan, kept as the record of how the
 first seven areas were built and verified.
 
+## Screenshot
+
+![Screenshot](screenshot.png "Screenshot")
+
 ## Status
 
 **13 areas, 79 categories, 249 demo screens**, every one of them exercising a real
