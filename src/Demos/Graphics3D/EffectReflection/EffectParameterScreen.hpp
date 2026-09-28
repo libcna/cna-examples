@@ -124,7 +124,7 @@ private:
                                        EffectParameterClass::Matrix, EffectParameterType::Single));
 
         for (int i = 0; i < parameters.getCountProperty(); ++i) {
-            const EffectParameter& p = parameters[i];
+            const EffectParameter& p = *parameters[i];
             std::string row = p.getNameProperty();
             row.resize(14, ' ');
             std::string cls = ClassName(p.getParameterClassProperty());

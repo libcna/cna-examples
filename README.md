@@ -19,7 +19,7 @@ first seven areas were built and verified.
 
 ## Status
 
-**13 areas, 79 categories, 249 demo screens**, every one of them exercising a real
+**13 areas, 79 categories, 248 demo screens**, every one of them exercising a real
 `Microsoft::Xna::Framework` / `CNA::*` API call rather than a mock.
 
 | Area | Categories | Screens |
@@ -36,7 +36,7 @@ first seven areas were built and verified.
 | Media | Song, Video, MediaLibrary, Pictures | 17 |
 | Avatars | AvatarDescription, AvatarRenderer, Appearance & Wardrobe EXT | 7 |
 | 2D Graphics | 4 groups, 13 categories | 40 |
-| 3D Graphics | 5 groups, 17 categories | 43 |
+| 3D Graphics | 5 groups, 17 categories | 42 |
 
 Run `./build/cna_examples --list-demos` for the full, authoritative list.
 
@@ -128,15 +128,15 @@ tools/sweep_backend.sh build-sdlrenderer
 |---|---|
 | CMake | ≥ 3.20 |
 | C++ compiler | C++23 (GCC 13+, Clang 16+, MSVC 19.38+) |
-| CNA | sibling directory `../cnanext` |
-| sharp-runtime | sibling directory `../sharp-runtimenext` |
+| CNA | sibling directory `../cna` |
+| sharp-runtime | sibling directory `../sharp-runtime` |
 
 Clone all three side-by-side:
 
 ```
-openeggbert/
-├── cnanext/
-├── sharp-runtimenext/
+libcna/
+├── cna/
+├── sharp-runtime/
 └── cna-examples/       ← this repo
 ```
 
@@ -167,7 +167,7 @@ needed (subject to CNA's own renderer maturity).
 cna-examples/
 ├── plan.md                        Architecture, CNA coverage analysis, roadmap
 ├── plan20260727.md                Archived previous plan
-├── CMakeLists.txt                 Top-level build (sibling add_subdirectory of ../cnanext)
+├── CMakeLists.txt                 Top-level build (sibling add_subdirectory of ../cna)
 ├── Content/                       Menu font + UI textures + demo media
 │   ├── MediaDemo/                 ffmpeg-generated tones and a test video clip
 │   └── MediaLibraryDemo/          A synthetic music/picture library (see tools/)
@@ -203,9 +203,9 @@ procedurally at runtime. No third-party audio, video, image or metadata is shipp
 
 The one exception is *borrowed, not bundled*: the Content area's `.xnb` demos need real
 MonoGame-produced files, which CNA can read but never write. Those are copied out of
-`../cnanext/tests/assets/xnb` into the build output at build time and are **not** in version
+`../cna/tests/assets/xnb` into the build output at build time and are **not** in version
 control — they are Ms-PL, and this repository is MIT. `FontCalibri14.xnb` is excluded even
-from that copy, because it embeds a rasterised Calibri glyph atlas. Build without `../cnanext`
+from that copy, because it embeds a rasterised Calibri glyph atlas. Build without `../cna`
 and the XNB demos report the fixtures as unavailable instead of failing.
 
 ## Development

@@ -248,7 +248,6 @@
 #include "Demos/Graphics3D/CustomShader/CustomGlslShaderScreen.hpp"
 #include "Demos/Graphics3D/CustomShader/InvalidShaderScreen.hpp"
 #include "Demos/Graphics3D/PbrEffect/PbrMetallicRoughnessScreen.hpp"
-#include "Demos/Graphics3D/PbrEffect/RenderPipelineSettingsScreen.hpp"
 #include "Demos/Graphics3D/DepthAndCulling/DepthStencilComparisonScreen.hpp"
 #include "Demos/Graphics3D/DepthAndCulling/CullModeScreen.hpp"
 #include "Demos/Graphics3D/DepthAndCulling/FillModeWireframeScreen.hpp"
@@ -1363,10 +1362,6 @@ inline std::vector<DemoEntry> BuildPbrEffectDemos() {
         "Metallic & Roughness",
         "The glTF metallic-roughness BRDF on a 5x3 sphere grid, verified live by pixel probe",
         {"PbrEffect"}));
-    demos.push_back(MakeDemo<RenderPipelineSettingsScreen>(
-        "RenderPipelineSettings: Extended Configuration",
-        "CNA_CNAEXT pipeline configuration -- defaults and every mutated value round-trip exactly",
-        {"RenderPipelineSettings"}));
     return demos;
 }
 

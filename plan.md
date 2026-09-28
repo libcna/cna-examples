@@ -36,7 +36,7 @@ generation, avatar mesh assets), `cna-examples` reuses that solution rather than
 
 ## 2. Current state (2026-07-28)
 
-Thirteen Areas, **249 demo screens** across 79 categories, all with real content. The numbers below
+Thirteen Areas, **248 demo screens** across 79 categories, all with real content. The numbers below
 are produced by `tools/check_catalog.py`, which cross-checks the screen files on disk against the
 `MakeDemo<>` registrations in `src/Navigation/AreaCatalog.hpp` and against the counts written into
 this file and `README.md`. Nothing here is counted by hand.
@@ -55,8 +55,8 @@ this file and `README.md`. Nothing here is counted by hand.
 | Media | — | 4 | 17 |
 | Avatars | — | 3 | 7 |
 | 2D Graphics | 4 | 13 | 40 |
-| 3D Graphics | 5 | 17 | 43 |
-| **Total** | **13** | **79** | **249** |
+| 3D Graphics | 5 | 17 | 42 |
+| **Total** | **13** | **79** | **248** |
 
 Before the Phase A work described below, the catalog held **168** demos in 50 categories. (An
 early draft of this document said 169 — that number came from counting `*Screen.hpp` files, which

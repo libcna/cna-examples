@@ -6,7 +6,6 @@
 #include <string>
 #include <vector>
 
-#include "CNA/Graphics/PbrMaterial.hpp"
 #include "Microsoft/Xna/Framework/Graphics/BufferUsage.hpp"
 #include "Microsoft/Xna/Framework/Graphics/DepthStencilState.hpp"
 #include "Microsoft/Xna/Framework/Graphics/IndexBuffer.hpp"
@@ -39,7 +38,6 @@ using Microsoft::Xna::Framework::Graphics::RasterizerState;
 using Microsoft::Xna::Framework::Graphics::VertexBuffer;
 using Microsoft::Xna::Framework::Graphics::VertexPositionNormalTangentTexture;
 using Microsoft::Xna::Framework::Graphics::Viewport;
-using CNA::Graphics::PbrMaterial;
 
 // PbrEffect is CNA's metallic-roughness BRDF -- the glTF/industry-standard
 // material model, and a genuinely different one from BasicEffect's
@@ -89,11 +87,6 @@ using CNA::Graphics::PbrMaterial;
 // private, NON-polymorphic, tightly-packed POD before upload, and upload
 // THAT at its own real (48-byte) stride -- never the polymorphic struct's
 // raw bytes directly.
-//
-// CNA::Graphics::PbrMaterial is the CNAEXT material representation for a glTF-style set of
-// texture slots and scalar factors. cnanext's glTF/content path and extended material binding
-// now consume it; PbrEffect still exposes its own direct properties, which this screen uses to
-// render the grid. The screen also verifies PbrMaterial's independent value round trip.
 class PbrMetallicRoughnessScreen : public DemoScreen {
 public:
     PbrMetallicRoughnessScreen() : DemoScreen("PbrEffect: Metallic & Roughness") {}
@@ -126,19 +119,6 @@ public:
         effect_->setTextureProperty(&*baseColor_);
         effect_->setDiffuseColorProperty(Vector3(0.85f, 0.68f, 0.30f));
 
-        // PbrMaterial's independent value contract: non-default values, read back exactly.
-        PbrMaterial mat;
-        const bool defaultsMatch = mat.getAlbedoTexture() == nullptr &&
-                                    mat.getMetallicFactor() == 0.0f &&
-                                    mat.getRoughnessFactor() == 0.5f;
-        mat.setMetallicFactor(0.9f);
-        mat.setRoughnessFactor(0.15f);
-        mat.setAlbedoTexture(&*baseColor_);
-        pbrMaterialHonest_ = defaultsMatch &&
-                              mat.getMetallicFactor() == 0.9f &&
-                              mat.getRoughnessFactor() == 0.15f &&
-                              mat.getAlbedoTexture() == &*baseColor_;
-
         rendered_ = false;
         probedOnce_ = false;
     }
@@ -162,25 +142,18 @@ protected:
         lines.push_back("A metal has NO diffuse term, so the bottom row darkens where it reflects nothing.");
         lines.push_back("VertexPositionNormalTangentTexture is polymorphic (hidden vtable ptr inflates its");
         lines.push_back("size past the naive 48 bytes) -- fix: repack into a private, packed POD first.");
-        lines.push_back("PbrMaterial is CNAEXT's related material representation: cnanext's glTF/content");
-        lines.push_back("path consumes it, while this grid uses PbrEffect's direct properties separately.");
         const Vector2 end = DrawLines(sb, font, Vector2(40.0f, 82.0f), lines, tint);
 
         // rendered_ reflects the PREVIOUS frame's probe (the probe itself can only run after
         // this frame's scene is drawn, below) -- stable from frame 2 onward, same
         // establish-then-report order OcclusionQueryScreen uses for its own async result.
-        // pbrMaterialHonest_ is the PbrMaterial round trip from OnDemoLoad -- folded into the
-        // same verdict so a future regression in that store (unlikely, but real) would show.
-        const bool allGood = rendered_ && pbrMaterialHonest_;
         DrawVerdict(sb, font, end.Y + 6.0f,
-                    mul(allGood ? Color(40, 200, 90, 255) : Color(220, 60, 60, 255),
+                    mul(rendered_ ? Color(40, 200, 90, 255) : Color(220, 60, 60, 255),
                         TransitionAlpha()),
                     tint,
-                    !rendered_
-                        ? "Probe found no geometry -- the centre sphere is not rendering."
-                        : !pbrMaterialHonest_
-                              ? "Sphere renders, but PbrMaterial's round trip is no longer faithful."
-                              : "Verified live: sphere renders and PbrMaterial round-trips faithfully.");
+                    rendered_
+                        ? "Verified live: the centre sphere renders."
+                        : "Probe found no geometry -- the centre sphere is not rendering.");
 
         sb.End();
         DrawGrid();
@@ -273,7 +246,6 @@ private:
     std::optional<PbrEffect> effect_;
     int triangleCount_ = 0;
     float spin_ = 0.0f;
-    bool pbrMaterialHonest_ = false;
     bool rendered_ = false;
     bool probedOnce_ = false;
 };

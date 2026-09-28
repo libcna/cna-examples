@@ -41,6 +41,10 @@ public:
             effect_.emplace(GenerateSineWavePcm16(392.0f, 6.0f), 44100, AudioChannels::Mono);
             instance_ = effect_->CreateInstance();
             instance_->setIsLoopedProperty(true);
+            // XNA's 3D/pan gate: an instance that starts playing without a
+            // prior Apply3D is a 2D (panned) instance, and Apply3D on it
+            // then throws InvalidOperationException. Aim it in 3D first.
+            Apply3DNow();
             instance_->Play();
         } catch (const NoAudioHardwareException&) {
             unavailable_ = true;
@@ -61,14 +65,7 @@ protected:
 
     void OnDemoUpdate(GameTime&) override {
         if (!instance_.has_value()) return;
-        AudioListener listener; // at origin, stationary.
-        AudioEmitter emitter;
-        emitter.setPositionProperty(Vector3(5.0f, 0.0f, 0.0f));
-        // -Z: approaching the listener along X toward the origin. Units are
-        // "per second" in whatever world scale SpeedOfSound is expressed in.
-        static constexpr float kVelocities[3] = {-20.0f, 0.0f, 20.0f};
-        emitter.setVelocityProperty(Vector3(kVelocities[velocityIndex_], 0.0f, 0.0f));
-        instance_->Apply3D(listener, emitter);
+        Apply3DNow();
     }
 
     void OnDemoDraw(const GameTime&, SpriteBatch& sb, SpriteFont& font) override {
@@ -92,6 +89,17 @@ protected:
     }
 
 private:
+    void Apply3DNow() {
+        AudioListener listener; // at origin, stationary.
+        AudioEmitter emitter;
+        emitter.setPositionProperty(Vector3(5.0f, 0.0f, 0.0f));
+        // -Z: approaching the listener along X toward the origin. Units are
+        // "per second" in whatever world scale SpeedOfSound is expressed in.
+        static constexpr float kVelocities[3] = {-20.0f, 0.0f, 20.0f};
+        emitter.setVelocityProperty(Vector3(kVelocities[velocityIndex_], 0.0f, 0.0f));
+        instance_->Apply3D(listener, emitter);
+    }
+
     std::optional<SoundEffect> effect_;
     std::optional<SoundEffectInstance> instance_;
     int velocityIndex_ = 1;

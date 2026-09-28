@@ -32,17 +32,22 @@ set(SHARP_RUNTIME_BUILD_TESTS OFF CACHE BOOL "Build sharp-runtime tests" FORCE)
 # extensions beyond XNA 4.0/WP7, not something every CNA consumer wants).
 set(CNA_DEVICES ON CACHE BOOL "Enable CNA-specific device/sensor extensions" FORCE)
 
-# CNA::Graphics::RenderPipelineSettings (D2's honesty screen) lives entirely
-# behind this flag -- default OFF in CNA itself, same reasoning as
-# CNA_DEVICES above (an extension beyond XNA 4.0).
+# CNA's extended graphics layer (reported by the Diagnostics area's Platform
+# screen) lives entirely behind this flag -- default OFF in CNA itself, same
+# reasoning as CNA_DEVICES above (an extension beyond XNA 4.0).
 set(CNA_CNAEXT ON CACHE BOOL "Enable CNA's extended graphics layer" FORCE)
 
-# cnanext consumes sharp-runtime as a sibling checkout. Pin that consumed
-# checkout explicitly so a build never silently falls back to ../sharp-runtime.
-set(CNA_SHARP_RUNTIME_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/../sharp-runtimenext"
-    CACHE PATH "Path to the sharp-runtime checkout consumed by CNA" FORCE)
+# CNA and sharp-runtime are sibling checkouts (../cna and ../sharp-runtime).
+# Both are CACHE paths, so -DCNA_EXAMPLES_CNA_ROOT=<path> or
+# -DCNA_SHARP_RUNTIME_ROOT=<path> can point a build at another checkout.
+# CNA_EXAMPLES_CNA_ROOT is also where cmake/ExamplesHelpers.cmake borrows the
+# XACT generator, .xnb fixtures and avatar content from.
+set(CNA_EXAMPLES_CNA_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/../cna"
+    CACHE PATH "Path to the CNA checkout this build consumes")
+set(CNA_SHARP_RUNTIME_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/../sharp-runtime"
+    CACHE PATH "Path to the sharp-runtime checkout consumed by CNA")
 
-add_subdirectory(../cnanext CNA_BUILD)
+add_subdirectory("${CNA_EXAMPLES_CNA_ROOT}" CNA_BUILD)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 include(ExamplesHelpers)

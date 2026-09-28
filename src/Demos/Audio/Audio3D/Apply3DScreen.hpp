@@ -41,6 +41,10 @@ public:
             effect_.emplace(GenerateSineWavePcm16(392.0f, 6.0f), 44100, AudioChannels::Mono);
             instance_ = effect_->CreateInstance();
             instance_->setIsLoopedProperty(true);
+            // XNA's 3D/pan gate: an instance that starts playing without a
+            // prior Apply3D is a 2D (panned) instance, and Apply3D on it
+            // then throws InvalidOperationException. Aim it in 3D first.
+            Apply3DNow();
             instance_->Play();
         } catch (const NoAudioHardwareException&) {
             unavailable_ = true;
@@ -66,10 +70,7 @@ protected:
 
     void OnDemoUpdate(GameTime&) override {
         if (!instance_.has_value()) return;
-        AudioListener listener; // default: at origin, facing -Z, matching FNA's default.
-        AudioEmitter emitter;
-        emitter.setPositionProperty(Vector3(emitterX_, 0.0f, 0.0f));
-        instance_->Apply3D(listener, emitter);
+        Apply3DNow();
     }
 
     void OnDemoDraw(const GameTime&, SpriteBatch& sb, SpriteFont& font) override {
@@ -91,6 +92,13 @@ protected:
     }
 
 private:
+    void Apply3DNow() {
+        AudioListener listener; // default: at origin, facing -Z, matching FNA's default.
+        AudioEmitter emitter;
+        emitter.setPositionProperty(Vector3(emitterX_, 0.0f, 0.0f));
+        instance_->Apply3D(listener, emitter);
+    }
+
     std::optional<SoundEffect> effect_;
     std::optional<SoundEffectInstance> instance_;
     float emitterX_ = 0.0f;

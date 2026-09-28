@@ -12,6 +12,8 @@
 #include "Microsoft/Xna/Framework/Rectangle.hpp"
 #include "Microsoft/Xna/Framework/Vector2.hpp"
 #include "Microsoft/Xna/Framework/GamerServices/GamerServicesComponent.hpp"
+#include "Microsoft/Xna/Framework/Graphics/GraphicsAdapter.hpp"
+#include "Microsoft/Xna/Framework/Graphics/GraphicsProfile.hpp"
 #include "Microsoft/Xna/Framework/Graphics/Texture2D.hpp"
 
 #include "GameStateManagement/ScreenManager.hpp"
@@ -29,6 +31,8 @@ using Microsoft::Xna::Framework::GameTime;
 using Microsoft::Xna::Framework::Rectangle;
 using Microsoft::Xna::Framework::Vector2;
 using Microsoft::Xna::Framework::GamerServices::GamerServicesComponent;
+using Microsoft::Xna::Framework::Graphics::GraphicsAdapter;
+using Microsoft::Xna::Framework::Graphics::GraphicsProfile;
 using Microsoft::Xna::Framework::Graphics::Texture2D;
 
 // Top-level application class. All navigation/UI logic lives in the
@@ -44,6 +48,15 @@ public:
         graphics_ = std::make_unique<GraphicsDeviceManager>(this);
         graphics_->setPreferredBackBufferWidthProperty(960);
         graphics_->setPreferredBackBufferHeightProperty(640);
+
+        // The catalog exercises HiDef-only APIs (GetBackBufferData, which the
+        // pixel probes and --screenshot both rely on, volume/cube textures,
+        // occlusion queries, ...), and CNA enforces XNA's profile rules: under
+        // the default Reach profile those throw NotSupportedException. Request
+        // HiDef wherever the adapter offers it, as an XNA game would.
+        if (GraphicsAdapter::getDefaultAdapterProperty().IsProfileSupported(GraphicsProfile::HiDef)) {
+            graphics_->setGraphicsProfileProperty(GraphicsProfile::HiDef);
+        }
 
         // Must be registered before any Microsoft::Xna::Framework::Net or
         // GamerServices API call (the Net area's demos rely on this being
