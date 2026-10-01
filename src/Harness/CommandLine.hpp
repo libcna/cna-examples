@@ -2,7 +2,8 @@
 #pragma once
 
 #include <cstdio>
-#include <cstdlib>
+#include <charconv>
+#include <cmath>
 #include <string>
 #include <vector>
 
@@ -67,6 +68,18 @@ inline bool ParseScriptedAction(const std::string& name, InputState::ScriptedAct
 inline Options ParseCommandLine(int argc, char** argv) {
     Options options;
 
+    auto positiveInt = [&](const char* value, const char* flag, int& target) -> bool {
+        const std::string text(value);
+        int parsed = 0;
+        const auto result = std::from_chars(text.data(), text.data() + text.size(), parsed);
+        if (result.ec != std::errc{} || result.ptr != text.data() + text.size() || parsed <= 0) {
+            options.error = std::string(flag) + " expects a positive integer";
+            return false;
+        }
+        target = parsed;
+        return true;
+    };
+
     auto needsValue = [&](int& i, const char* flag) -> const char* {
         if (i + 1 >= argc) {
             options.error = std::string(flag) + " needs a value";
@@ -93,7 +106,10 @@ inline Options ParseCommandLine(int argc, char** argv) {
             const char* v = needsValue(i, "--pointer");
             if (v == nullptr) break;
             float x = 0.0f, y1 = 0.0f, y2 = 0.0f;
-            if (std::sscanf(v, "%f,%f,%f", &x, &y1, &y2) != 3) {
+            int consumed = 0;
+            if (std::sscanf(v, "%f,%f,%f%n", &x, &y1, &y2, &consumed) != 3 ||
+                v[consumed] != '\0' || !std::isfinite(x) || !std::isfinite(y1) ||
+                !std::isfinite(y2)) {
                 options.error = "--pointer expects x,y1,y2 (e.g. 480,500,220)";
                 return options;
             }
@@ -104,9 +120,13 @@ inline Options ParseCommandLine(int argc, char** argv) {
         } else if (arg == "--screenshot") {
             if (const char* v = needsValue(i, "--screenshot")) options.screenshotPath = v; else break;
         } else if (arg == "--frames") {
-            if (const char* v = needsValue(i, "--frames")) options.frames = std::atoi(v); else break;
+            if (const char* v = needsValue(i, "--frames")) {
+                if (!positiveInt(v, "--frames", options.frames)) return options;
+            } else break;
         } else if (arg == "--key-interval") {
-            if (const char* v = needsValue(i, "--key-interval")) options.keyInterval = std::atoi(v); else break;
+            if (const char* v = needsValue(i, "--key-interval")) {
+                if (!positiveInt(v, "--key-interval", options.keyInterval)) return options;
+            } else break;
         } else if (arg == "--keys") {
             const char* v = needsValue(i, "--keys");
             if (v == nullptr) break;
@@ -137,7 +157,6 @@ inline Options ParseCommandLine(int argc, char** argv) {
 
     // A screenshot run has to end by itself or it never writes the file.
     if (!options.screenshotPath.empty() && options.frames <= 0) options.frames = 90;
-    if (options.keyInterval <= 0) options.keyInterval = 1;
     return options;
 }
 

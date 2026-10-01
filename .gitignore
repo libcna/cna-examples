@@ -63,6 +63,8 @@ desktop.ini
 *.log
 
 # Temporary
+__pycache__/
+.aws
 *.tmp
 *.bak
 *.swp

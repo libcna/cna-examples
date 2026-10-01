@@ -1,5 +1,28 @@
 # NEXT — short-term continuity for cna-examples
 
+## Current status (2026-10-01)
+
+- Branch: `develop`; catalog: **248 screens in 79 categories and 13 areas**. The
+  current count is checked by `tools/check_catalog.py` and by the executable's
+  `--list-demos` output.
+- The previous 249-screen status below predates the 2026-09-28 removal of
+  `RenderPipelineSettingsScreen`. Treat the remainder of this file as a
+  historical session record, not as the current build or test report.
+- F2 Emscripten: `WEBGL2` compiled and linked on 2026-10-01 against current CNA.
+  The generated Node CLI lists **245 demos**; the three Video demos are omitted
+  because CNA disables video on web. A browser rendering pass remains open.
+  The old upstream `Video` link failure no longer occurs. This project also
+  dropped its obsolete Wasm exception flags and now uses CNA's Asyncify target.
+- Current development checks: `ctest --test-dir build --output-on-failure` for
+  catalog, layout and CLI; `tools/sweep.sh` for a full native screenshot pass.
+- The seven Avatars demos use current standard XNA avatar APIs after CNA
+  removed its Avatar EXT layer. Their native screenshot sweep passed 7/7 with
+  zero layout findings; the last complete catalog sweep is still 2026-09-28.
+
+---
+
+## Archived session record (2026-07-28)
+
 **Updated:** 2026-07-28 (autonomous session continuing — D3, E, C4-extend, F1, D2 and all three
 of D2's follow-ups (RenderPipelineSettings, PbrMaterial) + D8's diagnosis correction, a
 `-Wall -Wextra` warnings audit, and a bounded SystemLink round-trip feasibility investigation, all

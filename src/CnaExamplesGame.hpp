@@ -3,6 +3,7 @@
 
 #include <cstdio>
 #include <cstdlib>
+#include <cstdint>
 #include <memory>
 #include <string>
 
@@ -135,7 +136,8 @@ private:
     // (0.3s on/off in DemoScreen) has time to settle before the next keystroke.
     void PumpScriptedKeys() {
         if (nextKey_ >= (int)options_.keys.size()) return;
-        if (frame_ < (nextKey_ + 1) * options_.keyInterval) return;
+        if (static_cast<std::int64_t>(frame_) <
+            (static_cast<std::int64_t>(nextKey_) + 1) * options_.keyInterval) return;
         screenManager_->getInput().QueueScriptedAction(options_.keys[(std::size_t)nextKey_]);
         nextKey_++;
     }
@@ -148,8 +150,9 @@ private:
     void PumpScriptedPointer() {
         if (!options_.pointerScript) return;
 
-        const int startFrame = (int)options_.keys.size() * options_.keyInterval + 8;
-        const int elapsed = frame_ - startFrame;
+        const std::int64_t startFrame =
+            static_cast<std::int64_t>(options_.keys.size()) * options_.keyInterval + 8;
+        const std::int64_t elapsed = static_cast<std::int64_t>(frame_) - startFrame;
         if (elapsed < 0) return;
 
         auto& input = screenManager_->getInput();

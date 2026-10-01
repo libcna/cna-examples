@@ -12,7 +12,7 @@ for *what the app is now and what it becomes next*.
 ## 1. Purpose
 
 `cna-examples` is a single cross-platform application that lets a user browse and run live
-demonstrations of every area of [CNA](https://github.com/openeggbert/cna) — the C++
+demonstrations of every area of [CNA](https://github.com/libcna/cna) — the C++
 reimplementation of the XNA 4.0 programming model, built on SDL3 and a pluggable graphics
 backend layer.
 
@@ -32,13 +32,13 @@ Two sibling repos cover adjacent ground and are deliberately *not* duplicated he
   menu, on desktop, web and mobile.
 
 Where `../cna/examples/` has already solved a hard content problem (runtime XACT bank
-generation, avatar mesh assets), `cna-examples` reuses that solution rather than re-deriving it.
+generation), `cna-examples` reuses that solution rather than re-deriving it.
 
-## 2. Current state (2026-07-28)
+## 2. Current state (2026-10-01)
 
-Thirteen Areas, **248 demo screens** across 79 categories, all with real content. The numbers below
+**13 areas, 79 categories, 248 demo screens**, all with real content. The numbers below
 are produced by `tools/check_catalog.py`, which cross-checks the screen files on disk against the
-`MakeDemo<>` registrations in `src/Navigation/AreaCatalog.hpp` and against the counts written into
+`MakeDemo<>` registrations in `src/Navigation/CatalogAreas/` and against the counts written into
 this file and `README.md`. Nothing here is counted by hand.
 
 | Area | Groups | Categories | Screens |
@@ -56,7 +56,7 @@ this file and `README.md`. Nothing here is counted by hand.
 | Avatars | — | 3 | 7 |
 | 2D Graphics | 4 | 13 | 40 |
 | 3D Graphics | 5 | 17 | 42 |
-| **Total** | **13** | **79** | **248** |
+| **Total** | **9** | **79** | **248** |
 
 Before the Phase A work described below, the catalog held **168** demos in 50 categories. (An
 early draft of this document said 169 — that number came from counting `*Screen.hpp` files, which
@@ -79,7 +79,7 @@ Per-category breakdown:
 | Media | Song (6), Video (3), MediaLibrary (4), Pictures (4) |
 | 2D Graphics | Drawing Basics (5), Sort Modes (5), DrawString (4), Begin/End & State (4), Texture2D Basics (5), SaveAs & Reload (2), SpriteFont (4), BlendState (2), SamplerState (2), Viewport & Scissor (3), Render-to-Texture Basics (2), Screen Transition (1), Dispose Safety (1) |
 | 3D Graphics | Vertex Types (3), Primitive Types (2), Buffers (3), Basic Rendering (3), Lighting (3), Fog (1), AlphaTestEffect (2), DualTextureEffect (1), EnvironmentMapEffect (2), SkinnedEffect (1), Custom Shader (2), Depth & Culling (3), Camera & Projection (2), Model (6), Volume & Cube Textures (4), Effect Reflection (3), PbrEffect (2) |
-| Avatars | AvatarDescription (2), AvatarRenderer (3), Appearance & Wardrobe EXT (2) |
+| Avatars | AvatarDescription (2), AvatarRenderer (3), Lighting & Variation (2) |
 
 ### 2.1 Defects found in the pre-existing state
 
@@ -109,7 +109,7 @@ These were real, verified problems with what shipped before this revision. Items
 | Tier | Platforms | Status |
 |---|---|---|
 | Now | Linux, Windows | Built and run regularly |
-| Now | Web (Emscripten) | Targeted by Phase F2 — CNA supports it; this app has not been built for it yet |
+| Build verified | Web (Emscripten) | `WEBGL2` linked on 2026-10-01; Node CLI lists 245 demos; browser rendering pending |
 | Later | Android | CNA supports it; deferred (no hardware pass planned this cycle) |
 | Future | macOS, iOS, consoles | Gated on CNA's own platform support |
 
@@ -123,8 +123,8 @@ touch-only user cannot currently scroll a list past what is already on screen).
 
 ## 4. Graphics backend strategy
 
-CNA selects its backend at compile time via `CNA_GRAPHICS_BACKEND`. This app defaults it to
-`EASYGL` (CNA's most complete backend) and never hard-codes a backend-specific assumption — it
+CNA selects its renderer at configure time via `CNA_GRAPHICS_RENDERER`. This app defaults it to
+`OPENGLES3` (implemented by EasyGL) and never hard-codes a backend-specific assumption — it
 uses only public `Microsoft::Xna::Framework` APIs.
 
 `EASYGL` and `SDL_RENDERER` are both verified (Phase F3). `SDL_RENDERER` is
@@ -134,8 +134,8 @@ than assume a full pipeline, which is exactly what a real CNA consumer has to do
 `Diagnostics` area (Phase C5) makes that capability model visible to the user as a demo in its
 own right.
 
-**F3 result.** *(Figures below are as-of F3, when the catalog held 218 screens. It has since grown
-to 248, and both backends were re-verified at 248/248 — see §7.0.)*
+**F3 result (historical).** *(Figures below are as-of F3, when the catalog held 218 screens.
+The current 248-screen catalog has an `OPENGLES3` sweep; `SDL_RENDERER` needs a fresh pass.)*
 `tools/sweep_backend.sh build-sdlrenderer` renders **218/218** with zero layout
 problems, and the EasyGL tree still renders 218/218 — no regression from the gating.
 
@@ -264,13 +264,20 @@ half of `Graphics`.
 
 ## 7. Roadmap
 
-Six phases. A is corrective and comes first because the app currently tells users things that are
-untrue. B is enabling: a 290-screen catalog is unusable without search and scrolling. C, D and E
-are the content build-out. F is verification.
+This section records the July 2026 roadmap and its results. Current build and test status is in
+§2–4 and `NEXT.md`'s first section. Six phases were planned: A corrected existing content, B
+added navigation, C–E expanded the catalog, and F verified it.
 
 Original target end state: **13 Areas, ~290 demo screens.**
 
 ### 7.0 Status as of 2026-07-28 — 249 screens, A/B/C/D/E/F1/F1b/F3 all done; only F2 remains, blocked upstream
+
+**Historical snapshot.** The current catalog has 248 screens: CNA retired the
+graphics engine layer and `RenderPipelineSettingsScreen` was removed on
+2026-09-28. The original F2 linker blocker disappeared in current CNA; the
+Emscripten `WEBGL2` build linked on 2026-10-01. The statements and counts in
+this section record the 2026-07-28 verification pass rather than current test
+results.
 
 | Phase | Status |
 |---|---|
@@ -1172,16 +1179,16 @@ cna-examples/
 ├── tools/
 │   ├── gen_menu_font.py           Regenerates the menu SpriteFont from a system TTF
 │   ├── gen_media_library.sh       A1: regenerates Content/MediaLibraryDemo/
-│   ├── headless.sh                B5: run one demo on a virtual display (never the real one)
+│   ├── headless.sh                Run one demo with SDL's offscreen driver
 │   ├── sweep.sh                   B5: screenshot every demo
 │   ├── check_shots.py             B5: flag blank / overflowing screenshots
-│   └── check_catalog.py           A5: screen files vs catalog vs docs consistency
+│   ├── check_catalog.py           A5: screen files vs catalog vs docs consistency
+│   └── check_cli.py               Catalog CLI and argument validation
 ├── Content/
 │   ├── menufont.cnj, menufont_atlas.png, blank.png
 │   ├── MediaDemo/                 5 synthetic ffmpeg-generated audio/video assets
 │   ├── MediaLibraryDemo/          A1: synthetic music + picture library
-│   ├── ContentDemo/               NEW (C3): .xnb fixtures copied from ../cna/tests/assets
-│   └── Avatar/                    NEW (E): avatar meshes copied from ../cna/examples/demo_avatar
+│   └── ContentDemo/               .xnb fixtures copied from ../cna/tests/assets at build time
 └── src/
     ├── Program.cpp                CLI parsing + entry point
     ├── CnaExamplesGame.hpp
@@ -1189,8 +1196,10 @@ cna-examples/
     ├── GameStateManagement/       Screen-stack navigation
     ├── Navigation/
     │   ├── HomeScreen.hpp, AreaScreen.hpp, GroupScreen.hpp, CategoryScreen.hpp
-    │   ├── SearchScreen.hpp       NEW (B1) -- will reuse Harness/DemoIndex.hpp
-    │   └── AreaCatalog.hpp        The Area → Group → Category → Demo registry
+    │   ├── SearchScreen.hpp       Search through the flat demo index
+    │   ├── AreaCatalog.hpp        Public catalog structures
+    │   ├── AreaCatalog.cpp        Area → Group → Category assembly
+    │   └── CatalogAreas/          Registrations, one source per Area
     └── Demos/
         ├── DemoScreen.hpp         Shared leaf-screen chrome
         ├── Input/  Audio/  Devices/  Net/  Media/
@@ -1203,28 +1212,27 @@ cna-examples/
         └── Avatars/               NEW (E)
 ```
 
-`AreaCatalog.hpp` is already 961 lines and will roughly double. Phase C splits it into one
-`Catalog/<Area>Catalog.hpp` per Area, with `AreaCatalog.hpp` reduced to the `BuildAreaCatalog()`
-assembly — otherwise every new Area touches the same file and every merge conflicts.
+The catalog now has a small public `AreaCatalog.hpp`, an assembly source
+`AreaCatalog.cpp`, and one `CatalogAreas/<Area>.cpp` source per Area. This keeps
+new demo changes in their Area's translation unit rather than recompiling the
+entire catalog.
 
 ## 9. Build system
 
 - CMake ≥ 3.20, C++23.
 - Consumes CNA via `add_subdirectory(../cna CNA_BUILD)`, which transitively pulls in
   `../sharp-runtime`.
-- Defaults `CNA_GRAPHICS_BACKEND` to `EASYGL`; forces `CNA_DEVICES=ON`.
+- Defaults `CNA_GRAPHICS_RENDERER` to `OPENGLES3`; forces `CNA_DEVICES=ON`.
 - One executable, `cna_examples`, linked against `CNA`, `CNA_Net`, `CNA_GamerServices` and
   `SHARP_RUNTIME`.
-- Per the openeggbert build rules: build into the fixed in-repo `build/` directory, always with
-  `-DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_COMPILER_LAUNCHER=ccache`, and always with an
-  explicit `-j4` ceiling. Never in a per-session scratchpad.
+- Reuse the in-repo `build/` directory and the shared `ccache`; choose parallelism
+  according to available memory (see `../AGENTS.md` on this development machine).
 
-New Content is generated or copied at configure time, never hand-authored as opaque binary:
+Additional Content is generated or copied at build time:
 
 - `Content/ContentDemo/` — copied from `../cna/tests/assets/xnb/`, which holds real
   MonoGame-produced `.xnb` files. CNA consumes `.xnb` and never writes it, so these cannot be
   generated locally.
-- `Content/Avatar/` — copied from `../cna/examples/demo_avatar/Content/`.
 - XACT banks — generated at runtime by the demo itself (§6.3), so nothing is bundled.
 
 ## 10. Out of scope

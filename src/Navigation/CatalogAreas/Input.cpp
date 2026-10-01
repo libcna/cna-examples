@@ -1,0 +1,197 @@
+// SPDX-License-Identifier: MIT
+#include "Navigation/AreaCatalogInternal.hpp"
+
+#include "Demos/Input/Keyboard/LiveKeyStateScreen.hpp"
+#include "Demos/Input/Keyboard/PressedKeysListScreen.hpp"
+#include "Demos/Input/Keyboard/KeyTransitionLogScreen.hpp"
+#include "Demos/Input/Keyboard/ModifiersAndLocksScreen.hpp"
+#include "Demos/Input/Keyboard/TextInputScreen.hpp"
+#include "Demos/Input/Keyboard/ScancodeKeycodeNamesScreen.hpp"
+#include "Demos/Input/Keyboard/StateEqualityHashScreen.hpp"
+#include "Demos/Input/Keyboard/PlayerIndexSlotsScreen.hpp"
+#include "Demos/Input/Keyboard/SingleKeyQueryScreen.hpp"
+#include "Demos/Input/Keyboard/KeyHoldDurationScreen.hpp"
+#include "Demos/Input/Mouse/LivePositionButtonsScreen.hpp"
+#include "Demos/Input/Mouse/ScrollWheelScreen.hpp"
+#include "Demos/Input/Mouse/SetPositionScreen.hpp"
+#include "Demos/Input/Mouse/CursorShapesScreen.hpp"
+#include "Demos/Input/Mouse/ClickedEventScreen.hpp"
+#include "Demos/Input/Mouse/RelativeModeScreen.hpp"
+#include "Demos/Input/Mouse/GlobalPositionWarpScreen.hpp"
+#include "Demos/Input/Mouse/CaptureScreen.hpp"
+#include "Demos/Input/Mouse/StateEqualityHashScreen.hpp"
+#include "Demos/Input/Mouse/ButtonTransitionLogScreen.hpp"
+#include "Demos/Input/Gamepad/ConnectionAndCapabilitiesScreen.hpp"
+#include "Demos/Input/Gamepad/LiveButtonsGridScreen.hpp"
+#include "Demos/Input/Gamepad/DPadThumbsticksScreen.hpp"
+#include "Demos/Input/Gamepad/TriggersScreen.hpp"
+#include "Demos/Input/Gamepad/DeadZoneModesScreen.hpp"
+#include "Demos/Input/Gamepad/VibrationScreen.hpp"
+#include "Demos/Input/Gamepad/MotionAndLightBarScreen.hpp"
+#include "Demos/Input/Gamepad/PowerInfoScreen.hpp"
+#include "Demos/Input/Gamepad/PlayerIndexEXTScreen.hpp"
+#include "Demos/Input/Gamepad/DeviceInfoScreen.hpp"
+#include "Demos/Input/Gamepad/StateEqualityHashScreen.hpp"
+#include "Demos/Input/Touch/LiveTouchesScreen.hpp"
+#include "Demos/Input/Touch/CapabilitiesAndDisplayScreen.hpp"
+#include "Demos/Input/Touch/TapAndDoubleTapScreen.hpp"
+#include "Demos/Input/Touch/HoldAndFlickScreen.hpp"
+#include "Demos/Input/Touch/DragGesturesScreen.hpp"
+#include "Demos/Input/Touch/PinchGestureScreen.hpp"
+#include "Demos/Input/Touch/AllGesturesLogScreen.hpp"
+#include "Demos/Input/Touch/GestureQueueScreen.hpp"
+#include "Demos/Input/Touch/TouchLocationQueryScreen.hpp"
+#include "Demos/Input/Touch/PeakTouchesScreen.hpp"
+#include "Demos/Input/Other/JoystickEnumerationScreen.hpp"
+#include "Demos/Input/Other/JoystickLiveStateScreen.hpp"
+#include "Demos/Input/Other/JoystickStateEqualityScreen.hpp"
+#include "Demos/Input/Other/JoystickHotplugScreen.hpp"
+#include "Demos/Input/Other/SensorsScreen.hpp"
+#include "Demos/Input/Other/PowerScreen.hpp"
+#include "Demos/Input/Other/HapticsScreen.hpp"
+#include "Demos/Input/Other/InputDeviceEnumerationScreen.hpp"
+#include "Demos/Input/Other/InputDeviceHotplugScreen.hpp"
+#include "Demos/Input/Other/OtherSummaryScreen.hpp"
+#include "Demos/Input/Other/SentinelsAndFactoriesScreen.hpp"
+
+namespace CnaExamples::Navigation {
+
+std::vector<DemoEntry> BuildKeyboardDemos() {
+    using namespace CnaExamples::Demos::Input::KeyboardDemos;
+    std::vector<DemoEntry> demos;
+    demos.push_back(MakeDemo<LiveKeyStateScreen>(
+        "Live Key State", "IsKeyDown() on a curated keyboard-shaped grid"));
+    demos.push_back(MakeDemo<PressedKeysListScreen>(
+        "Pressed Keys List", "GetPressedKeys() live listing"));
+    demos.push_back(MakeDemo<KeyTransitionLogScreen>(
+        "Press/Release Log", "Edge-detected down/up events over time"));
+    demos.push_back(MakeDemo<ModifiersAndLocksScreen>(
+        "Modifiers & Locks", "GetModStateEXT() -- Shift/Ctrl/Alt/Caps/Num/Scroll"));
+    demos.push_back(MakeDemo<TextInputScreen>(
+        "Text Input", "TextInputEXT -- composed, IME-aware character events"));
+    demos.push_back(MakeDemo<ScancodeKeycodeNamesScreen>(
+        "Scancode vs. Keycode", "Physical vs. layout-dependent key naming (EXT)"));
+    demos.push_back(MakeDemo<StateEqualityHashScreen>(
+        "State Equals()/GetHashCode()", "Snapshot comparison correctness"));
+    demos.push_back(MakeDemo<PlayerIndexSlotsScreen>(
+        "GetState(PlayerIndex)", "The 4-slot local-multiplayer keyboard API"));
+    demos.push_back(MakeDemo<SingleKeyQueryScreen>(
+        "IsKeyDown / operator[]", "The single-key query surface, side by side"));
+    demos.push_back(MakeDemo<KeyHoldDurationScreen>(
+        "Hold Duration & Repeat", "Building typematic repeat on IsKeyDown + GameTime"));
+    return demos;
+}
+
+std::vector<DemoEntry> BuildMouseDemos() {
+    using namespace CnaExamples::Demos::Input::MouseDemos;
+    std::vector<DemoEntry> demos;
+    demos.push_back(MakeDemo<LivePositionButtonsScreen>(
+        "Live Position & Buttons", "GetState() -- position and all five button states"));
+    demos.push_back(MakeDemo<ScrollWheelScreen>(
+        "Scroll Wheel", "Cumulative value + derived per-frame delta, vertical and horizontal"));
+    demos.push_back(MakeDemo<SetPositionScreen>(
+        "SetPosition()", "The write side of the Mouse API -- warping the cursor"));
+    demos.push_back(MakeDemo<CursorShapesScreen>(
+        "Cursor Shapes", "MouseCursor's stock shape gallery (EXT)"));
+    demos.push_back(MakeDemo<ClickedEventScreen>(
+        "ClickedEXT Event", "Event-driven clicks vs. polling ButtonState (EXT)"));
+    demos.push_back(MakeDemo<RelativeModeScreen>(
+        "Relative Mode", "Absolute position vs. per-frame motion delta (EXT)"));
+    demos.push_back(MakeDemo<GlobalPositionWarpScreen>(
+        "Global Position & Warp", "Desktop-space coordinates, independent of the window (EXT)"));
+    demos.push_back(MakeDemo<CaptureScreen>(
+        "Capture", "Keep receiving events once the cursor leaves the window (EXT)"));
+    demos.push_back(MakeDemo<StateEqualityHashScreen>(
+        "State Equals()/GetHashCode()", "Snapshot comparison correctness"));
+    demos.push_back(MakeDemo<ButtonTransitionLogScreen>(
+        "Button Press/Release Log", "Edge-detected transitions from polled ButtonState"));
+    return demos;
+}
+
+std::vector<DemoEntry> BuildGamepadDemos() {
+    using namespace CnaExamples::Demos::Input::GamepadDemos;
+    std::vector<DemoEntry> demos;
+    demos.push_back(MakeDemo<ConnectionAndCapabilitiesScreen>(
+        "Connection & Capabilities", "IsConnected + GetCapabilities() across all 4 player slots"));
+    demos.push_back(MakeDemo<LiveButtonsGridScreen>(
+        "Live Buttons Grid", "IsButtonDown() on every digital button"));
+    demos.push_back(MakeDemo<DPadThumbsticksScreen>(
+        "DPad & Thumbsticks", "The DPad and analog stick positions, live"));
+    demos.push_back(MakeDemo<TriggersScreen>(
+        "Triggers", "Analog trigger values + GamePad::TriggerThreshold"));
+    demos.push_back(MakeDemo<DeadZoneModesScreen>(
+        "Dead Zone Modes", "None vs. IndependentAxes vs. Circular, side by side"));
+    demos.push_back(MakeDemo<VibrationScreen>(
+        "Vibration", "SetVibration() + SetTriggerVibrationEXT()"));
+    demos.push_back(MakeDemo<PowerInfoScreen>(
+        "Power Info", "Battery/charge state (EXT)"));
+    demos.push_back(MakeDemo<PlayerIndexEXTScreen>(
+        "Player Index LED", "The controller's own player-number LED (EXT)"));
+    demos.push_back(MakeDemo<DeviceInfoScreen>(
+        "Device Info", "GUID/path/serial/firmware/Steam handle/connection/touchpads (EXT)"));
+    demos.push_back(MakeDemo<StateEqualityHashScreen>(
+        "State Equals()/GetHashCode()", "Snapshot comparison correctness"));
+    demos.push_back(MakeDemo<MotionAndLightBarScreen>(
+        "Motion Sensors & Light Bar",
+        "GetGyroEXT/GetAccelerometerEXT return bool; SetLightBarEXT reports nothing",
+        {"GamePad"}));
+    return demos;
+}
+
+std::vector<DemoEntry> BuildTouchDemos() {
+    using namespace CnaExamples::Demos::Input::TouchDemos;
+    std::vector<DemoEntry> demos;
+    demos.push_back(MakeDemo<LiveTouchesScreen>(
+        "Live Touches", "Raw per-finger state from GetState(), up to MAX_TOUCHES"));
+    demos.push_back(MakeDemo<CapabilitiesAndDisplayScreen>(
+        "Capabilities & Display", "GetCapabilities() + the display geometry gestures use"));
+    demos.push_back(MakeDemo<TapAndDoubleTapScreen>(
+        "Tap & DoubleTap", "The two simplest discrete gestures"));
+    demos.push_back(MakeDemo<HoldAndFlickScreen>(
+        "Hold & Flick", "A stationary hold vs. a fast released drag"));
+    demos.push_back(MakeDemo<DragGesturesScreen>(
+        "Drag Gestures", "Horizontal/Vertical/Free drag + DragComplete"));
+    demos.push_back(MakeDemo<PinchGestureScreen>(
+        "Pinch Gesture", "The only gesture using both fingers' Position2/Delta2"));
+    demos.push_back(MakeDemo<AllGesturesLogScreen>(
+        "All Gestures Log", "Every GestureType enabled at once"));
+    demos.push_back(MakeDemo<GestureQueueScreen>(
+        "Gesture Queue", "IsGestureAvailable()/ReadGesture()'s drain-the-queue contract"));
+    demos.push_back(MakeDemo<TouchLocationQueryScreen>(
+        "TouchLocation Equals()/ToString()", "Snapshot comparison correctness"));
+    demos.push_back(MakeDemo<PeakTouchesScreen>(
+        "Peak Simultaneous Touches", "TouchDeviceExistsEXT + a derived peak-touch-count metric"));
+    return demos;
+}
+
+std::vector<DemoEntry> BuildOtherDemos() {
+    using namespace CnaExamples::Demos::Input::OtherDemos;
+    std::vector<DemoEntry> demos;
+    demos.push_back(MakeDemo<JoystickEnumerationScreen>(
+        "Joystick Enumeration", "Raw joystick/wheel/flight-stick enumeration + capabilities (EXT)"));
+    demos.push_back(MakeDemo<JoystickLiveStateScreen>(
+        "Joystick Live State", "Unmapped raw axes/buttons/hats/trackballs (EXT)"));
+    demos.push_back(MakeDemo<JoystickStateEqualityScreen>(
+        "Joystick State ==/!=", "Snapshot comparison correctness (EXT)"));
+    demos.push_back(MakeDemo<JoystickHotplugScreen>(
+        "Joystick Hot-plug Events", "Connected/DisconnectedEXT (EXT)"));
+    demos.push_back(MakeDemo<SensorsScreen>(
+        "Host Device Sensors", "The machine's own accelerometer/gyroscope (EXT)"));
+    demos.push_back(MakeDemo<PowerScreen>(
+        "Host Power/Battery", "XNA has no power API at all -- a pure CNA extension (EXT)"));
+    demos.push_back(MakeDemo<HapticsScreen>(
+        "Haptics", "Force-feedback device enumeration + capability checks (EXT)"));
+    demos.push_back(MakeDemo<InputDeviceEnumerationScreen>(
+        "Input Device Enumeration", "Every mouse/keyboard/touch device by id (EXT)"));
+    demos.push_back(MakeDemo<InputDeviceHotplugScreen>(
+        "Device Hot-plug Events", "Mouse/Keyboard Connected/DisconnectedEXT (EXT)"));
+    demos.push_back(MakeDemo<OtherSummaryScreen>(
+        "Summary", "An at-a-glance dashboard across every subsystem above"));
+    demos.push_back(MakeDemo<SentinelsAndFactoriesScreen>(
+        "Sentinels & Factories",
+        "FindById's Invalid sentinel, TouchPanel::NO_FINGER, GamePadButtons::FromButtonArray",
+        {"TouchCollection", "TouchPanel", "GamePadButtons"}));
+    return demos;
+}
+
+} // namespace CnaExamples::Navigation

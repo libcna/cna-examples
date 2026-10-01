@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: MIT
 #
-# Screenshot every demo (or the ones matching a filter) headlessly under Xvfb,
+# Screenshot every demo (or the ones matching a filter) headlessly,
 # using the app's own --demo/--screenshot driver. Used for the verification
 # sweeps described in plan.md Phase F1.
 #
@@ -14,12 +14,9 @@
 
 set -uo pipefail
 
-# Force SDL onto X11 and hide any Wayland session from it. Without this, SDL3
-# picks the Wayland video driver whenever WAYLAND_DISPLAY is set and ignores the
-# DISPLAY that xvfb-run exports -- so every "headless" run would open a real
-# window on the developer's actual desktop. Exported here rather than left to
-# each caller, because getting it wrong is silent and extremely annoying.
-export SDL_VIDEODRIVER=x11
+# SDL's offscreen driver supports the default OpenGL ES renderer and avoids
+# dependence on an X server. SDL_VIDEODRIVER=x11 selects the Xvfb fallback.
+export SDL_VIDEODRIVER="${SDL_VIDEODRIVER:-offscreen}"
 unset WAYLAND_DISPLAY
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -29,11 +26,12 @@ FILTER="${1:-}"
 FRAMES="${FRAMES:-90}"
 
 if [[ ! -x "$BUILD/cna_examples" ]]; then
-    echo "cna_examples not built -- run: cmake --build build -j4 --target cna_examples" >&2
+    echo "cna_examples not built -- run: cmake --build build --parallel --target cna_examples" >&2
     exit 1
 fi
 
 mkdir -p "$OUT"
+OUT="$(cd "$OUT" && pwd)"
 
 # Clear stale output first. A renamed or deleted demo otherwise leaves its old
 # .png behind forever, so check_shots.py counts more screenshots than there are
@@ -43,6 +41,8 @@ if [[ -z "$FILTER" ]]; then
     rm -f "$OUT"/*.png "$OUT"/*.log
 fi
 cd "$BUILD"
+runner=()
+if [[ "$SDL_VIDEODRIVER" == x11 ]]; then runner=(xvfb-run -a); fi
 
 mapfile -t DEMOS < <(./cna_examples --list-demos | { [[ -n "$FILTER" ]] && grep -F "$FILTER" || cat; })
 
@@ -61,7 +61,7 @@ for path in "${DEMOS[@]}"; do
     png="$OUT/$safe.png"
     log="$OUT/$safe.log"
 
-    if xvfb-run -a ./cna_examples --demo "$path" --frames "$FRAMES" --screenshot "$png" \
+    if "${runner[@]}" ./cna_examples --demo "$path" --frames "$FRAMES" --screenshot "$png" \
             > "$log" 2>&1 && [[ -s "$png" ]]; then
         printf '  ok   %s\n' "$path"
     else

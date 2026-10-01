@@ -41,7 +41,7 @@ set(CNA_CNAEXT ON CACHE BOOL "Enable CNA's extended graphics layer" FORCE)
 # Both are CACHE paths, so -DCNA_EXAMPLES_CNA_ROOT=<path> or
 # -DCNA_SHARP_RUNTIME_ROOT=<path> can point a build at another checkout.
 # CNA_EXAMPLES_CNA_ROOT is also where cmake/ExamplesHelpers.cmake borrows the
-# XACT generator, .xnb fixtures and avatar content from.
+# XACT generator and .xnb fixtures from.
 set(CNA_EXAMPLES_CNA_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/../cna"
     CACHE PATH "Path to the CNA checkout this build consumes")
 set(CNA_SHARP_RUNTIME_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/../sharp-runtime"
@@ -59,6 +59,20 @@ include(ExamplesHelpers)
 
 add_executable(cna_examples
     src/Program.cpp
+    src/Navigation/AreaCatalog.cpp
+    src/Navigation/CatalogAreas/Input.cpp
+    src/Navigation/CatalogAreas/Audio.cpp
+    src/Navigation/CatalogAreas/Devices.cpp
+    src/Navigation/CatalogAreas/Net.cpp
+    src/Navigation/CatalogAreas/Media.cpp
+    src/Navigation/CatalogAreas/Framework.cpp
+    src/Navigation/CatalogAreas/Math.cpp
+    src/Navigation/CatalogAreas/Content.cpp
+    src/Navigation/CatalogAreas/Storage.cpp
+    src/Navigation/CatalogAreas/Diagnostics.cpp
+    src/Navigation/CatalogAreas/Graphics2D.cpp
+    src/Navigation/CatalogAreas/Graphics3D.cpp
+    src/Navigation/CatalogAreas/Avatars.cpp
 )
 
 target_include_directories(cna_examples PRIVATE
@@ -72,3 +86,19 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
 endif()
 
 cna_examples_configure_target(cna_examples)
+
+# Fast, graphics-free checks. The screenshot sweep remains an explicit local
+# verification step because it needs a working renderer.
+enable_testing()
+find_package(Python3 COMPONENTS Interpreter QUIET)
+if(Python3_Interpreter_FOUND)
+    add_test(NAME catalog
+        COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/tools/check_catalog.py")
+    add_test(NAME layout
+        COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/tools/check_layout.py")
+    if(NOT EMSCRIPTEN)
+        add_test(NAME cli
+            COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/tools/check_cli.py"
+                    "$<TARGET_FILE:cna_examples>")
+    endif()
+endif()

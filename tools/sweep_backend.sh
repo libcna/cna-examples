@@ -14,9 +14,8 @@
 
 set -uo pipefail
 
-# Same reason as tools/headless.sh: xvfb-run alone is not enough, because SDL3
-# prefers Wayland whenever WAYLAND_DISPLAY is set and then ignores DISPLAY.
-export SDL_VIDEODRIVER=x11
+# Use SDL offscreen by default; SDL_VIDEODRIVER=x11 selects Xvfb instead.
+export SDL_VIDEODRIVER="${SDL_VIDEODRIVER:-offscreen}"
 unset WAYLAND_DISPLAY
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -34,13 +33,14 @@ OUT="${OUT:-$BUILD/screenshots}"
 
 if [[ ! -x "$BUILD/cna_examples" ]]; then
     echo "no cna_examples in $BUILD -- configure and build it first, e.g.:" >&2
-    echo "  cmake -S . -B $BUILD_DIR -DCNA_GRAPHICS_BACKEND=SDL_RENDERER \\" >&2
+    echo "  cmake -S . -B $BUILD_DIR -DCNA_GRAPHICS_RENDERER=SDL_RENDERER \\" >&2
     echo "    -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_COMPILER_LAUNCHER=ccache" >&2
-    echo "  cmake --build $BUILD_DIR -j4 --target cna_examples" >&2
+    echo "  cmake --build $BUILD_DIR --parallel --target cna_examples" >&2
     exit 1
 fi
 
 mkdir -p "$OUT"
+OUT="$(cd "$OUT" && pwd)"
 
 # Clear stale output first. A renamed or deleted demo otherwise leaves its old
 # .png behind forever, so check_shots.py counts more screenshots than there are
@@ -50,6 +50,8 @@ if [[ -z "$FILTER" ]]; then
     rm -f "$OUT"/*.png "$OUT"/*.log
 fi
 cd "$BUILD"
+runner=()
+if [[ "$SDL_VIDEODRIVER" == x11 ]]; then runner=(xvfb-run -a); fi
 
 mapfile -t DEMOS < <(./cna_examples --list-demos | { [[ -n "$FILTER" ]] && grep -F "$FILTER" || cat; })
 if [[ ${#DEMOS[@]} -eq 0 ]]; then
@@ -66,7 +68,7 @@ for path in "${DEMOS[@]}"; do
     png="$OUT/$safe.png"
     log="$OUT/$safe.log"
 
-    if xvfb-run -a ./cna_examples --demo "$path" --frames "$FRAMES" --screenshot "$png" \
+    if "${runner[@]}" ./cna_examples --demo "$path" --frames "$FRAMES" --screenshot "$png" \
             > "$log" 2>&1 && [[ -s "$png" ]]; then
         printf '  ok   %s\n' "$path"
     else
