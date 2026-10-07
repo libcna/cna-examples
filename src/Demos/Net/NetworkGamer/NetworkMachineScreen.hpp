@@ -9,8 +9,8 @@
 #include "Microsoft/Xna/Framework/Net/NetworkSession.hpp"
 #include "System/NotImplementedException.hpp"
 
-#include "Demos/DemoScreen.hpp"
 #include "Demos/Net/NetDemoHelpers.hpp"
+#include "Demos/Net/SignedInGamerDemoScreen.hpp"
 
 namespace CnaExamples::Demos::Net::NetworkGamerDemos {
 
@@ -21,9 +21,9 @@ using Microsoft::Xna::Framework::Net::NetworkMachine;
 // Demonstrates NetworkGamer::Machine (the NetworkMachine grouping gamers that share a
 // physical host) and NetworkMachine::RemoveFromSession() -- which always throws
 // NotImplementedException, matching FNA's own stub, not a CNA gap.
-class NetworkMachineScreen : public DemoScreen {
+class NetworkMachineScreen : public SignedInGamerDemoScreen {
 public:
-    NetworkMachineScreen() : DemoScreen("NetworkGamer: NetworkMachine") {}
+    NetworkMachineScreen() : SignedInGamerDemoScreen("NetworkGamer: NetworkMachine") {}
 
     void OnDemoLoad() override {
         session_ = NetworkSession::Create(NetworkSessionType::Local, 1, 4);

@@ -7,8 +7,8 @@
 #include "Microsoft/Xna/Framework/Net/NetworkGamer.hpp"
 #include "Microsoft/Xna/Framework/Net/NetworkSession.hpp"
 
-#include "Demos/DemoScreen.hpp"
 #include "Demos/Net/NetDemoHelpers.hpp"
+#include "Demos/Net/SignedInGamerDemoScreen.hpp"
 
 namespace CnaExamples::Demos::Net::NetworkGamerDemos {
 
@@ -17,14 +17,11 @@ using Microsoft::Xna::Framework::Net::NetworkGamer;
 
 // Demonstrates NetworkSession::AllGamers/LocalGamers/RemoteGamers/PreviousGamers and the
 // per-gamer NetworkGamer properties (Id/IsHost/IsLocal/RoundtripTime), on a
-// NetworkSessionType::Local session created with maxLocalGamers=2. In practice this yields
-// only 1 local gamer, not 2: NetworkSession's implicit-local-gamer loop skips any
-// SignedInGamer with IsGuest true, and 3 of the 4 stub SignedInGamers GamerServicesComponent
-// populates (all but SignedInGamers[0]) are guests -- a real, verified consequence of the
-// stub data, not a bug in this screen.
-class GamerRosterScreen : public DemoScreen {
+// NetworkSessionType::Local session created with maxLocalGamers=2. The session takes up to
+// that many of the signed-in gamers, so with one profile signed in it has 1 local gamer.
+class GamerRosterScreen : public SignedInGamerDemoScreen {
 public:
-    GamerRosterScreen() : DemoScreen("NetworkGamer: Roster") {}
+    GamerRosterScreen() : SignedInGamerDemoScreen("NetworkGamer: Roster") {}
 
     void OnDemoLoad() override {
         session_ = NetworkSession::Create(NetworkSessionType::Local, 2, 4);

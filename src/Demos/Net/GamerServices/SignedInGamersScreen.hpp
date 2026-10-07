@@ -17,12 +17,11 @@ using namespace CnaExamples::GameStateManagement;
 using Microsoft::Xna::Framework::GamerServices::Gamer;
 using Microsoft::Xna::Framework::GamerServices::SignedInGamer;
 
-// Demonstrates Gamer::SignedInGamers -- populated with 4 "Stub Gamer" entries the instant
-// GamerServicesDispatcher::Initialize() runs (this app's own GamerServicesComponent does that
-// at startup; see CnaExamplesGame.hpp), matching FNA's own permanent stub-sign-in behavior
-// rather than any real platform sign-in flow. Also subscribes the static SignedIn/SignedOut
-// events, which are genuine public XNA 4.0 API but never actually raised in this platform's
-// implementation -- expect both counters to stay at 0.
+// Demonstrates Gamer::SignedInGamers and the static SignedIn/SignedOut events. As on XNA, a
+// profile signed in at startup (CNA_GAMER_SERVICES_AUTO_SIGN_IN, or "autoSignIn" in the profile
+// store) appears, raising SignedIn, at the first GamerServicesDispatcher update -- this app's own
+// GamerServicesComponent drives it (see CnaExamplesGame.hpp); Guide::ShowSignIn signs one in
+// later. With nobody signed in the collection is simply empty.
 class SignedInGamersScreen : public DemoScreen {
 public:
     SignedInGamersScreen() : DemoScreen("GamerServices: Signed-In Gamers") {}
@@ -55,7 +54,7 @@ protected:
         lines.emplace_back();
         lines.push_back("SignedIn fired: " + std::to_string(signedInCount_) +
                          "   SignedOut fired: " + std::to_string(signedOutCount_));
-        lines.push_back("(real public XNA events, never raised on this platform)");
+        lines.push_back("(raised as profiles sign in and out)");
 
         DrawLines(sb, font, Vector2(40.0f, 90.0f), lines, mul(Color::White, TransitionAlpha()));
     }

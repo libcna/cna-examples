@@ -11,8 +11,8 @@
 #include "Microsoft/Xna/Framework/Net/NetworkSession.hpp"
 #include "Microsoft/Xna/Framework/Net/NetworkSessionProperties.hpp"
 
-#include "Demos/DemoScreen.hpp"
 #include "Demos/Net/NetDemoHelpers.hpp"
+#include "Demos/Net/SignedInGamerDemoScreen.hpp"
 
 namespace CnaExamples::Demos::Net::NetworkSessionDemos {
 
@@ -29,15 +29,16 @@ using Microsoft::Xna::Framework::Net::NetworkSessionProperties;
 // NetworkSession::GamerJoined's own doc comment) -- LoadContent() below follows that exact
 // pattern. HostChanged is subscribed too but is never actually raised on this branch (real
 // host migration is a stored-but-inert property here, not implemented).
-class SessionPropertiesAndEventsScreen : public DemoScreen {
+class SessionPropertiesAndEventsScreen : public SignedInGamerDemoScreen {
 public:
-    SessionPropertiesAndEventsScreen() : DemoScreen("NetworkSession: Properties & Events") {}
+    SessionPropertiesAndEventsScreen() : SignedInGamerDemoScreen("NetworkSession: Properties & Events") {}
 
     void OnDemoLoad() override {
+        // XNA's NetworkSessionProperties is a fixed set of 8 nullable slots: Add() throws
+        // NotSupportedException, so the columns are written by index.
         NetworkSessionProperties properties;
-        properties.Add(7);
-        properties.Add(std::nullopt);
-        properties.Add(42);
+        properties[0] = 7;
+        properties[2] = 42;
 
         session_ = NetworkSession::Create(NetworkSessionType::Local, 2, 4, 0, properties);
         session_->GamerJoined += [this](System::Object*, const GamerJoinedEventArgs& e) {
@@ -74,7 +75,8 @@ protected:
         std::vector<std::string> lines;
         lines.push_back("Space/Enter/A/tap: ResetReady()   J: toggle local gamer[0] IsReady");
         lines.emplace_back();
-        lines.push_back("SessionProperties (int?, 3 slots): ");
+        lines.push_back("SessionProperties (int?, " +
+                        std::to_string(session_->getSessionPropertiesProperty().getCountProperty()) + " slots): ");
         std::string props = "  [";
         for (const auto& p : session_->getSessionPropertiesProperty()) {
             props += p.has_value() ? std::to_string(*p) : std::string("null");

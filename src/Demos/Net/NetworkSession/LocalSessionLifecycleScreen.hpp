@@ -10,8 +10,8 @@
 #include "Microsoft/Xna/Framework/Net/NetworkSession.hpp"
 #include "Microsoft/Xna/Framework/Net/NetworkSessionEndedEventArgs.hpp"
 
-#include "Demos/DemoScreen.hpp"
 #include "Demos/Net/NetDemoHelpers.hpp"
+#include "Demos/Net/SignedInGamerDemoScreen.hpp"
 
 namespace CnaExamples::Demos::Net::NetworkSessionDemos {
 
@@ -26,9 +26,9 @@ using Microsoft::Xna::Framework::Net::NetworkSessionEndedEventArgs;
 // with no real networking involved (Local sessions route their event queue purely in-memory).
 // Session events are queued internally and only raised on Update(), not synchronously --
 // OnDemoUpdate() drives that every active frame.
-class LocalSessionLifecycleScreen : public DemoScreen {
+class LocalSessionLifecycleScreen : public SignedInGamerDemoScreen {
 public:
-    LocalSessionLifecycleScreen() : DemoScreen("NetworkSession: Local Lifecycle") {}
+    LocalSessionLifecycleScreen() : SignedInGamerDemoScreen("NetworkSession: Local Lifecycle") {}
 
     void OnDemoLoad() override {
         session_ = NetworkSession::Create(NetworkSessionType::Local, 1, 4);

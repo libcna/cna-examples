@@ -13,7 +13,7 @@
 #include "Microsoft/Xna/Framework/GamerServices/SignedInGamerCollection.hpp"
 #include "System/NotSupportedException.hpp"
 
-#include "Demos/DemoScreen.hpp"
+#include "Demos/Net/SignedInGamerDemoScreen.hpp"
 
 namespace CnaExamples::Demos::Net::LeaderboardsDemos {
 
@@ -28,9 +28,9 @@ using Microsoft::Xna::Framework::GamerServices::SignedInGamer;
 // type once constructed) alongside Gamer::LeaderboardWriter::GetLeaderboard(), which always
 // throws NotSupportedException on this platform (same stub-API-surface reasoning as
 // LeaderboardReaderScreen -- there is no leaderboard backend to write to).
-class LeaderboardWriterScreen : public DemoScreen {
+class LeaderboardWriterScreen : public SignedInGamerDemoScreen {
 public:
-    LeaderboardWriterScreen() : DemoScreen("Leaderboards: LeaderboardWriter") {}
+    LeaderboardWriterScreen() : SignedInGamerDemoScreen("Leaderboards: LeaderboardWriter") {}
 
     void OnDemoLoad() override {
         gamer_ = (*Gamer::getSignedInGamersProperty())[PlayerIndex::One];

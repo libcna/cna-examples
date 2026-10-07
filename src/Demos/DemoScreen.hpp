@@ -82,10 +82,12 @@ public:
     // Demos that need loading therefore override OnDemoLoad/OnDemoUnload rather
     // than LoadContent/UnloadContent directly. `loaded_` ensures the unload hook
     // runs if and only if the load hook did.
+    //
+    // A demo whose PrerequisitesMet() is false when the screen loads is loaded
+    // by the first Update that finds it true, and runs none of its hooks before.
     void LoadContent() final {
         if (!CapabilityAvailable()) return;
-        loaded_ = true;
-        OnDemoLoad();
+        LoadWhenReady();
     }
 
     void UnloadContent() final {
@@ -99,7 +101,8 @@ public:
         // A demo whose capability is missing must not run at all -- its update
         // would make the very calls the backend throws on.
         if (IsActive() && CapabilityAvailable()) {
-            OnDemoUpdate(gameTime);
+            LoadWhenReady();
+            if (loaded_) OnDemoUpdate(gameTime);
         }
     }
 
@@ -117,7 +120,12 @@ public:
             return;
         }
 
-        if (CapabilityAvailable()) OnDemoInput(input);
+        if (!CapabilityAvailable()) return;
+        if (loaded_) {
+            OnDemoInput(input);
+        } else {
+            OnNotReadyInput(input);
+        }
     }
 
     void Draw(const GameTime& gameTime) override {
@@ -142,10 +150,12 @@ public:
                       Vector2(((float)viewport.getWidthProperty() - headingSize.X) / 2.0f, 20.0f),
                       mul(Color(192, 192, 192), alpha));
 
-        if (CapabilityAvailable()) {
+        if (!CapabilityAvailable()) {
+            DrawUnavailable(sb, font, alpha);
+        } else if (loaded_) {
             OnDemoDraw(gameTime, sb, font);
         } else {
-            DrawUnavailable(sb, font, alpha);
+            DrawNotReady(sb, font, alpha);
         }
 
         DrawApiFooter(sb, font, alpha, viewport.getWidthProperty(), viewport.getHeightProperty());
@@ -160,6 +170,15 @@ protected:
     // Override instead of LoadContent/UnloadContent -- see the note on those.
     virtual void OnDemoLoad() {}
     virtual void OnDemoUnload() {}
+
+    // Something the demo needs that the running application, unlike the backend,
+    // can still provide -- a signed-in gamer, say. Until it holds the demo is not
+    // loaded; it draws DrawNotReady() instead and receives OnNotReadyInput().
+    [[nodiscard]] virtual bool PrerequisitesMet() const { return true; }
+    virtual void OnNotReadyInput(InputState& input) { (void)input; }
+    virtual void DrawNotReady(SpriteBatch& spriteBatch, SpriteFont& font, float alpha) {
+        (void)spriteBatch; (void)font; (void)alpha;
+    }
 
     // Override to poll live device state once per active frame (most Input
     // demos call the real Microsoft::Xna::Framework::Input static APIs
@@ -289,6 +308,12 @@ protected:
     }
 
 private:
+    void LoadWhenReady() {
+        if (loaded_ || !PrerequisitesMet()) return;
+        loaded_ = true;
+        OnDemoLoad();
+    }
+
     [[nodiscard]] bool CapabilityAvailable() const {
         if (!requiredCapability_.has_value()) return true;
         return GetScreenManager()->getGraphicsDeviceProperty().SupportsCapability(

@@ -11,8 +11,8 @@
 #include "Microsoft/Xna/Framework/Net/NetworkSessionType.hpp"
 #include "Microsoft/Xna/Framework/Net/SendDataOptions.hpp"
 
-#include "Demos/DemoScreen.hpp"
 #include "Demos/Net/NetDemoHelpers.hpp"
+#include "Demos/Net/SignedInGamerDemoScreen.hpp"
 
 namespace CnaExamples::Demos::Net::NetworkSessionDemos {
 
@@ -59,9 +59,9 @@ using Microsoft::Xna::Framework::Net::SendDataOptions;
 //
 // The measurement below sends the same burst twice through a Local session --
 // once at 0% loss, once at 100% -- and checks the counts.
-class SimulatedConditionsScreen : public DemoScreen {
+class SimulatedConditionsScreen : public SignedInGamerDemoScreen {
 public:
-    SimulatedConditionsScreen() : DemoScreen("Simulated Latency & Packet Loss") {}
+    SimulatedConditionsScreen() : SignedInGamerDemoScreen("Simulated Latency & Packet Loss") {}
 
     void OnDemoLoad() override {
         try {

@@ -8,8 +8,8 @@
 #include "Microsoft/Xna/Framework/Net/GamerLeftEventArgs.hpp"
 #include "Microsoft/Xna/Framework/Net/NetworkSession.hpp"
 
-#include "Demos/DemoScreen.hpp"
 #include "Demos/Net/NetDemoHelpers.hpp"
+#include "Demos/Net/SignedInGamerDemoScreen.hpp"
 
 namespace CnaExamples::Demos::Net::NetworkSessionDemos {
 
@@ -23,9 +23,9 @@ using Microsoft::Xna::Framework::Net::GamerLeftEventArgs;
 // screen). This screen keeps the session open for as long as it stays on
 // screen; run a second cna_examples instance and pick "Discover & Join"
 // there to see this session actually found and joined.
-class SystemLinkHostScreen : public DemoScreen {
+class SystemLinkHostScreen : public SignedInGamerDemoScreen {
 public:
-    SystemLinkHostScreen() : DemoScreen("NetworkSession: SystemLink Host") {}
+    SystemLinkHostScreen() : SignedInGamerDemoScreen("NetworkSession: SystemLink Host") {}
 
     void OnDemoLoad() override {
         // The 8 requested here is never actually applied -- EndCreate() unconditionally

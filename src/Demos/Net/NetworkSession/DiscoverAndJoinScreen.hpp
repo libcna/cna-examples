@@ -9,8 +9,8 @@
 #include "Microsoft/Xna/Framework/Net/NetworkSession.hpp"
 #include "Microsoft/Xna/Framework/Net/NetworkSessionProperties.hpp"
 
-#include "Demos/DemoScreen.hpp"
 #include "Demos/Net/NetDemoHelpers.hpp"
+#include "Demos/Net/SignedInGamerDemoScreen.hpp"
 
 namespace CnaExamples::Demos::Net::NetworkSessionDemos {
 
@@ -24,9 +24,9 @@ using Microsoft::Xna::Framework::Net::NetworkSessionProperties;
 // running the SystemLink Host screen to actually find anything on this desktop; with none
 // running, Find() still genuinely executes real discovery I/O and correctly returns zero
 // results.
-class DiscoverAndJoinScreen : public DemoScreen {
+class DiscoverAndJoinScreen : public SignedInGamerDemoScreen {
 public:
-    DiscoverAndJoinScreen() : DemoScreen("NetworkSession: Discover & Join") {}
+    DiscoverAndJoinScreen() : SignedInGamerDemoScreen("NetworkSession: Discover & Join") {}
 
     void OnDemoUnload() override {
         EndSession(joinedSession_);

@@ -53,7 +53,7 @@ std::vector<DemoEntry> BuildGamerServicesDemos() {
     using namespace CnaExamples::Demos::Net::GamerServicesDemos;
     std::vector<DemoEntry> demos;
     demos.push_back(MakeDemo<SignedInGamersScreen>(
-        "Signed-In Gamers", "The 4 stub SignedInGamers + the real SignedIn/SignedOut events"));
+        "Signed-In Gamers", "SignedInGamers + the SignedIn/SignedOut events"));
     demos.push_back(MakeDemo<ProfilePresencePrivilegesScreen>(
         "Profile/Presence/Privileges", "GetProfile() + live-adjustable Presence + Privileges"));
     demos.push_back(MakeDemo<AchievementsScreen>(

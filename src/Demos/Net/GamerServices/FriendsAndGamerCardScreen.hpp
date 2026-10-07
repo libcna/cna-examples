@@ -11,7 +11,7 @@
 #include "Microsoft/Xna/Framework/GamerServices/SignedInGamer.hpp"
 #include "Microsoft/Xna/Framework/GamerServices/SignedInGamerCollection.hpp"
 
-#include "Demos/DemoScreen.hpp"
+#include "Demos/Net/SignedInGamerDemoScreen.hpp"
 
 namespace CnaExamples::Demos::Net::GamerServicesDemos {
 
@@ -26,9 +26,9 @@ using Microsoft::Xna::Framework::GamerServices::SignedInGamer;
 // CreateInternal(), the only way to see FriendGamer's IsOnline/IsPlaying/IsAway/Presence
 // fields populated on this platform. Also exercises Guide::ShowFriends()/ShowGamerCard(),
 // both real, silent no-ops.
-class FriendsAndGamerCardScreen : public DemoScreen {
+class FriendsAndGamerCardScreen : public SignedInGamerDemoScreen {
 public:
-    FriendsAndGamerCardScreen() : DemoScreen("GamerServices: Friends & GamerCard") {}
+    FriendsAndGamerCardScreen() : SignedInGamerDemoScreen("GamerServices: Friends & GamerCard") {}
 
     void OnDemoLoad() override {
         gamer_ = (*Gamer::getSignedInGamersProperty())[PlayerIndex::One];

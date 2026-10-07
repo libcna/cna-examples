@@ -11,7 +11,7 @@
 #include "Microsoft/Xna/Framework/GamerServices/SignedInGamer.hpp"
 #include "Microsoft/Xna/Framework/GamerServices/SignedInGamerCollection.hpp"
 
-#include "Demos/DemoScreen.hpp"
+#include "Demos/Net/SignedInGamerDemoScreen.hpp"
 
 namespace CnaExamples::Demos::Net::GamerServicesDemos {
 
@@ -24,9 +24,9 @@ using Microsoft::Xna::Framework::GamerServices::SignedInGamer;
 // Demonstrates SignedInGamer::GetProfile()/Presence/Privileges on the first stub signed-in
 // gamer -- all populated with plausible-but-synthetic defaults (there is no real profile
 // backend), but the getter/setter surface itself is real and functional.
-class ProfilePresencePrivilegesScreen : public DemoScreen {
+class ProfilePresencePrivilegesScreen : public SignedInGamerDemoScreen {
 public:
-    ProfilePresencePrivilegesScreen() : DemoScreen("GamerServices: Profile/Presence/Privileges") {}
+    ProfilePresencePrivilegesScreen() : SignedInGamerDemoScreen("GamerServices: Profile/Presence/Privileges") {}
 
     void OnDemoLoad() override {
         gamer_ = (*Gamer::getSignedInGamersProperty())[PlayerIndex::One];

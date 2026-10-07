@@ -25,6 +25,17 @@ OUT="${OUT:-$ROOT/build/screenshots}"
 FILTER="${1:-}"
 FRAMES="${FRAMES:-90}"
 
+# The Net demos need a signed-in gamer. Sign in a throwaway profile, kept in a
+# throwaway profile store, so the sweep runs them without reading or writing the
+# user's own profiles. A caller's setting of either variable wins; setting
+# CNA_GAMER_SERVICES_AUTO_SIGN_IN to empty sweeps with nobody signed in.
+export CNA_GAMER_SERVICES_AUTO_SIGN_IN="${CNA_GAMER_SERVICES_AUTO_SIGN_IN-Sweep}"
+if [[ -z "${CNA_GAMER_SERVICES_PROFILES_DIR:-}" ]]; then
+    CNA_GAMER_SERVICES_PROFILES_DIR="$(mktemp -d)"
+    export CNA_GAMER_SERVICES_PROFILES_DIR
+    trap 'rm -rf "$CNA_GAMER_SERVICES_PROFILES_DIR"' EXIT
+fi
+
 if [[ ! -x "$BUILD/cna_examples" ]]; then
     echo "cna_examples not built -- run: cmake --build build --parallel --target cna_examples" >&2
     exit 1

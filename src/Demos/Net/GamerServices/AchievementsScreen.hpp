@@ -12,7 +12,7 @@
 #include "System/DateTime.hpp"
 #include "System/NotImplementedException.hpp"
 
-#include "Demos/DemoScreen.hpp"
+#include "Demos/Net/SignedInGamerDemoScreen.hpp"
 
 namespace CnaExamples::Demos::Net::GamerServicesDemos {
 
@@ -27,9 +27,9 @@ using Microsoft::Xna::Framework::GamerServices::SignedInGamer;
 // throws NotImplementedException (a genuine platform-unavailability limitation carried over
 // from FNA, not something this port could implement -- real Xbox achievement art was streamed
 // from Xbox Live).
-class AchievementsScreen : public DemoScreen {
+class AchievementsScreen : public SignedInGamerDemoScreen {
 public:
-    AchievementsScreen() : DemoScreen("GamerServices: Achievements") {}
+    AchievementsScreen() : SignedInGamerDemoScreen("GamerServices: Achievements") {}
 
     void OnDemoLoad() override {
         gamer_ = (*Gamer::getSignedInGamersProperty())[PlayerIndex::One];
