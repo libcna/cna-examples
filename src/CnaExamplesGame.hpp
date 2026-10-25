@@ -40,7 +40,7 @@ using Microsoft::Xna::Framework::Graphics::Texture2D;
 // ScreenManager component (see GameStateManagement/ and Navigation/); this
 // class only wires up the window/graphics device, pushes the first screen, and
 // -- when run headlessly -- drives the scripted-input/screenshot harness.
-// See plan.md for the overall architecture.
+// See docs/architecture.md for the overall architecture.
 class CnaExamplesGame : public Game {
 public:
     explicit CnaExamplesGame(Harness::Options options = {}) : options_(std::move(options)) {

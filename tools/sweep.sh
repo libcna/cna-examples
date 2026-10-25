@@ -2,8 +2,8 @@
 # SPDX-License-Identifier: MIT
 #
 # Screenshot every demo (or the ones matching a filter) headlessly,
-# using the app's own --demo/--screenshot driver. Used for the verification
-# sweeps described in plan.md Phase F1.
+# using the app's own --demo/--screenshot driver. This is the full renderer
+# verification pass described in docs/architecture.md.
 #
 # Usage:
 #   tools/sweep.sh                       # every demo

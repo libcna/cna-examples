@@ -2,10 +2,9 @@
 # SPDX-License-Identifier: MIT
 """Check that demo classes, per-area registrations, and current counts agree.
 
-This exists because they silently drifted apart once already: plan.md claimed
-12 Audio demo screens when there were 10, and nothing anywhere would have
-noticed. With ~290 screens planned, a number in prose is a number nobody
-re-derives by hand.
+This exists because the catalog and its documentation silently drifted apart
+once already: a prose inventory claimed 12 Audio demo screens when there were
+10, and nothing would have noticed without deriving the numbers from source.
 
 Checks performed:
 
@@ -16,7 +15,7 @@ Checks performed:
   3. No class is registered twice (two menu entries running the same screen is
      almost always a copy-paste slip, not intent).
   4. The README current-status total, category count, and area table match the
-     actual catalog. The plan's current-state total matches too.
+     actual catalog.
 
 Usage:
   tools/check_catalog.py            # check, exit non-zero on any disagreement
@@ -130,8 +129,8 @@ def main() -> int:
 
     total = len(registrations)
 
-    # 4. Check the designated current-status fields, not a stray historical
-    # mention of the same number elsewhere in a long roadmap.
+    # 4. README is the single human-readable inventory. Check its designated
+    # current-status fields rather than accepting another number elsewhere.
     catalog_text = CATALOG.read_text(encoding="utf-8")
     actual_areas = len(re.findall(r"\bAreaEntry\{", catalog_text))
     actual_categories = len(re.findall(r"\bCategoryEntry\{", catalog_text))
@@ -149,37 +148,6 @@ def main() -> int:
                         readme, re.MULTILINE)
         if not row or int(row.group(1)) != count:
             problems.append(f"README.md area table: {display} must have {count} screens")
-
-    plan = (ROOT / "plan.md").read_text(encoding="utf-8")
-    current = re.search(r"^\*\*(\d+) areas, (\d+) categories, (\d+) demo screens\*\*",
-                        plan, re.MULTILINE)
-    if not current or tuple(map(int, current.groups())) != (actual_areas, actual_categories, total):
-        problems.append(f"plan.md current state must say {actual_areas} areas, "
-                        f"{actual_categories} categories, {total} demo screens")
-
-    area_starts = list(re.finditer(r'\bAreaEntry\{"([^"]+)"', catalog_text))
-    group_total = 0
-    for index, match in enumerate(area_starts):
-        end = area_starts[index + 1].start() if index + 1 < len(area_starts) else len(catalog_text)
-        block = catalog_text[match.start():end]
-        name = match.group(1)
-        groups = len(re.findall(r"\bGroupEntry\{", block))
-        categories = len(re.findall(r"\bCategoryEntry\{", block))
-        group_total += groups
-        area = next((source for source, display in display_names.items() if display == name), name)
-        row = re.search(r"^\|\s*" + re.escape(name) +
-                        r"\s*\|\s*([^|]+)\|\s*(\d+)\s*\|\s*(\d+)\s*\|$",
-                        plan, re.MULTILINE)
-        expected_groups = "—" if groups == 0 else str(groups)
-        if (not row or row.group(1).strip() != expected_groups or
-                int(row.group(2)) != categories or int(row.group(3)) != per_area[area]):
-            problems.append(f"plan.md current table: {name} must have "
-                            f"{groups} groups, {categories} categories, {per_area[area]} screens")
-    summary = re.search(r"^\| \*\*Total\*\* \| \*\*(\d+)\*\* \| \*\*(\d+)\*\* \| \*\*(\d+)\*\* \|$",
-                        plan, re.MULTILINE)
-    if not summary or tuple(map(int, summary.groups())) != (group_total, actual_categories, total):
-        problems.append(f"plan.md current table total must be {group_total} groups, "
-                        f"{actual_categories} categories, {total} screens")
 
     if "--list" in sys.argv:
         print("Demo screens per area:")

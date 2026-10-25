@@ -9,9 +9,8 @@ in-app navigation), but entirely CNA-specific — no JavaFX code, assets, or dep
 Pick an area from the home menu, drill into a category, and run the demo — all inside one
 application, on desktop, web or mobile.
 
-See [plan.md](plan.md) for the architecture, the CNA API coverage analysis, and the roadmap.
-[plan20260727.md](plan20260727.md) is the archived previous plan, kept as the record of how the
-first seven areas were built and verified.
+See [the architecture document](docs/architecture.md) for the stable design decisions behind the
+catalog. [NEXT.md](NEXT.md) contains only the current follow-up checks.
 
 ## Screenshot
 
@@ -69,7 +68,7 @@ registrations in `src/Navigation/CatalogAreas/`.
   its current catalog needs a fresh sweep.
   `SDL_RENDERER` is 2D-only by design, so the 3D Graphics area is gated on
   `GraphicsDevice::SupportsCapability(ThreeD)` and those demos explain themselves rather than
-  throwing. See `plan.md` §4.
+  throwing. See [Renderer capability gating](docs/architecture.md#renderer-capability-gating).
 - **Web:** An Emscripten `WEBGL2` build linked on 2026-10-01. Its Node CLI listed 245 demos;
   the three Video demos are omitted because CNA disables video in this configuration.
   Browser rendering still needs a browser run. The native Avatars sweep passed 7/7 after
@@ -189,8 +188,8 @@ needed (subject to CNA's own renderer maturity).
 
 ```
 cna-examples/
-├── plan.md                        Architecture, CNA coverage analysis, roadmap
-├── plan20260727.md                Archived previous plan
+├── docs/architecture.md           Stable design decisions and project boundaries
+├── NEXT.md                        Current follow-up checks
 ├── CMakeLists.txt                 Top-level build (sibling add_subdirectory of ../cna)
 ├── Content/                       Menu font + UI textures + demo media
 │   ├── MediaDemo/                 ffmpeg-generated tones and a test video clip

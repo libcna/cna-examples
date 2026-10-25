@@ -19,8 +19,8 @@ using Microsoft::Xna::Framework::Input::MouseState;
 
 // Demonstrates Mouse::GetState(): live cursor position and all five button
 // states (Left/Right/Middle/XButton1/XButton2). Also draws a small marker at
-// the cursor position, doubling as the manual hardware-validation tool
-// (see plan.md section 5.1) for "does the mouse move/click actually work".
+// the cursor position, doubling as the manual hardware-validation tool for
+// "does the mouse move/click actually work".
 class LivePositionButtonsScreen : public DemoScreen {
 public:
     LivePositionButtonsScreen() : DemoScreen("Mouse: Live Position & Buttons") {}

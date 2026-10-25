@@ -3,9 +3,8 @@
 
 namespace CnaExamples::Navigation {
 
-// Builds the full Home -> Area -> Category -> Demo data set. This is the
-// single place new areas/categories/demos get registered as they are
-// implemented; see plan.md section 8 for what is intentionally still empty.
+// Builds the full Home -> Area -> optional Group -> Category -> Demo data set
+// from the per-area registration functions declared in AreaCatalogInternal.hpp.
 std::vector<AreaEntry> BuildAreaCatalog() {
     return {
         AreaEntry{"Framework", {

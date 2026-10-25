@@ -71,8 +71,7 @@ using Microsoft::Xna::Framework::Graphics::Viewport;
 // than failing, which is exactly how this screen was first written and what
 // pixel measurement caught.
 //
-// THE ACTUAL BUG this screen was reverted over (found on a later pass, see
-// docs/wip-pbr/README.md and NEXT.md's D2 entry for the full investigation):
+// THE ACTUAL BUG found on a later verification pass was the uploaded stride:
 // VertexPositionNormalTangentTexture inherits IVertexType, which declares a
 // virtual destructor -- so the struct carries a hidden 8-byte vtable pointer,
 // and its REAL sizeof() is 56, not the naive 48 = 12+12+16+8 this screen
@@ -217,8 +216,8 @@ private:
         // top edge sits above the whole grid (the top row's sphere extends to
         // world Y ~1.47, well short of the ~2.24 half-height this camera
         // shows at this distance), so it stays background regardless of
-        // whether the grid rendered. Same GetBackBufferData route
-        // tools/headless.sh's own --screenshot uses (NEXT.md discovery #1).
+        // whether the grid rendered. This uses the same GetBackBufferData
+        // route as tools/headless.sh's own --screenshot capture.
         if (!probedOnce_) {
             const int centerX = scene.getXProperty() + scene.getWidthProperty() / 2;
             const int centerY = scene.getYProperty() + scene.getHeightProperty() / 2;

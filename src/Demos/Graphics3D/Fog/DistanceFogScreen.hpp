@@ -57,7 +57,7 @@ using Microsoft::Xna::Framework::Graphics::Viewport;
 // for the lateral (X) placement and a FIXED (non-distance-dependent) Z
 // translation that repositions the whole baked-Z range relative to the
 // camera. This is an honest workaround for a confirmed real limitation,
-// not a fabricated demo -- see plan.md section 5.7 for the full writeup.
+// not a fabricated demo.
 class DistanceFogScreen : public DemoScreen {
 public:
     static constexpr float kCameraWorldZ = 2.0f;

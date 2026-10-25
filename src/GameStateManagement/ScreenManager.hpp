@@ -28,7 +28,7 @@ using Microsoft::Xna::Framework::Graphics::Texture2D;
 
 // A component owning a stack of GameScreens: calls their Update/Draw at the
 // right time and routes input to the topmost active (non-covered) screen.
-// This is the navigation substrate for the whole app -- see plan.md section 4.
+// This is the navigation substrate for the whole app; see docs/architecture.md.
 class ScreenManager : public DrawableGameComponent {
 public:
     explicit ScreenManager(Game& game) : DrawableGameComponent(game) {}

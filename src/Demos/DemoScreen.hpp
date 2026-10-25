@@ -49,7 +49,7 @@ public:
     // so marked is not run at all on a backend that lacks the capability; it
     // explains itself instead.
     //
-    // Set at the catalog assembly site (see Requiring() in AreaCatalog.hpp)
+    // Set at the catalog assembly site (see Requiring() in AreaCatalogInternal.hpp)
     // rather than inside each screen, so a whole category can be marked at once
     // and no demo can forget.
     void SetRequiredCapability(CNA::GraphicsCapability capability) {

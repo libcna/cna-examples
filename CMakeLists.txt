@@ -54,7 +54,7 @@ include(ExamplesHelpers)
 
 # ---------------------------------------------------------------------------
 # cna_examples — the single browsable demo-catalog application.
-# See plan.md for the navigation architecture and Area/Category/Demo layout.
+# See docs/architecture.md for the navigation and demo-screen architecture.
 # ---------------------------------------------------------------------------
 
 add_executable(cna_examples

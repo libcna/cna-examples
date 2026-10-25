@@ -20,9 +20,8 @@ using Microsoft::Xna::Framework::Input::Keys;
 
 // Demonstrates Keyboard::GetState().IsKeyDown(Keys) by rendering a curated
 // keyboard-shaped grid of labels that turn yellow while the physical key is
-// held. Doubles as the manual hardware-validation tool that
-// ../../plan_input.md Phase 11 needed a human for (see cna-examples plan.md
-// section 5.1) -- press any listed key here and confirm it lights up.
+// held. It also serves as the manual hardware-validation tool: press any
+// listed key and confirm it lights up.
 class LiveKeyStateScreen : public DemoScreen {
 public:
     LiveKeyStateScreen() : DemoScreen("Keyboard: Live Key State") {}

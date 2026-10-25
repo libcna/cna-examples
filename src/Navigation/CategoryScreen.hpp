@@ -13,9 +13,9 @@ namespace CnaExamples::Navigation {
 
 using namespace CnaExamples::GameStateManagement;
 
-// Third-level menu: lists the demos within one Category (e.g. Input ->
-// Keyboard -> {list of keyboard demos}). Empty until real demo screens are
-// registered in AreaCatalog.hpp -- see plan.md section 8.
+// Final menu level: lists the demos within one Category (e.g. Input ->
+// Keyboard -> {list of keyboard demos}). Registrations live in the matching
+// Navigation/CatalogAreas/<Area>.cpp source.
 class CategoryScreen : public MenuScreen {
 public:
     // `pathPrefix` is the breadcrumb trail leading here ("Media", or

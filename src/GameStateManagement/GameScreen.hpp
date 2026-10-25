@@ -3,7 +3,7 @@
 // Adapted from the official XNA "Game State Management" sample, ported to CNA
 // at ../cna-samples/samples/GameStateManagement (Ms-PL, (c) Microsoft). This
 // file is an independent reimplementation of the same well-known pattern for
-// this MIT-licensed app; see plan.md section 4.
+// this MIT-licensed app; see docs/architecture.md.
 #pragma once
 
 #include <optional>

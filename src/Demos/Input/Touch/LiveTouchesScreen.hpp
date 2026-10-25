@@ -22,9 +22,8 @@ using Microsoft::Xna::Framework::Input::Touch::TouchPanel;
 // Demonstrates TouchPanel::GetState(): the raw per-finger touch collection
 // (up to TouchPanel::MAX_TOUCHES), independent of gesture recognition --
 // each active finger's id/state/position/pressure, plus a marker drawn at
-// its position. The manual hardware-validation "touch the screen" tool for
-// this app (see plan.md section 5.1); needs a real touchscreen/Android
-// device, not a desktop mouse, to exercise beyond the empty state.
+// its position. This manual hardware-validation tool needs a real touchscreen
+// or Android device, not a desktop mouse, to exercise beyond the empty state.
 class LiveTouchesScreen : public DemoScreen {
 public:
     LiveTouchesScreen() : DemoScreen("Touch: Live Touches") {}

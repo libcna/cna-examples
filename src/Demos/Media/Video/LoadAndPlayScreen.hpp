@@ -25,7 +25,7 @@ using Microsoft::Xna::Framework::Media::VideoPlayer;
 // GetTexture() decodes real frames on demand, clock-driven, into a live
 // Texture2D drawn here every frame. The clip is a fully synthetic ffmpeg
 // lavfi testsrc (color bars) + a sine tone, muxed to H.264/AAC MP4 -- no
-// licensed video asset is bundled with this app (see plan.md section 5.5).
+// licensed video asset is bundled with this app (see docs/architecture.md).
 class LoadAndPlayScreen : public DemoScreen {
 public:
     LoadAndPlayScreen() : DemoScreen("Video: Load & Play") {}
