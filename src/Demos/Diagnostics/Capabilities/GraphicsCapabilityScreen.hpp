@@ -86,8 +86,6 @@ private:
         {CNA::GraphicsCapability::HalfFloatRenderTargets,   "HalfFloatRenderTargets",  "16-bit float render targets"},
         {CNA::GraphicsCapability::HalfFloatTextureLinearFiltering,
                                                         "HalfFloatTextureFiltering", "linear filtering of half-float textures"},
-        {CNA::GraphicsCapability::ComputeShaders,           "ComputeShaders",          "compute shaders and storage buffers"},
-        {CNA::GraphicsCapability::IndirectDraw,             "IndirectDraw",            "GPU-buffer-driven draw arguments"},
     };
 
     static std::string Pad(const std::string& text, std::size_t width) {

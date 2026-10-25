@@ -361,8 +361,6 @@ private:
             case CNA::GraphicsCapability::HalfFloatRenderTargets:   return "HalfFloatRenderTargets";
             case CNA::GraphicsCapability::HalfFloatTextureLinearFiltering:
                 return "HalfFloatTextureLinearFiltering";
-            case CNA::GraphicsCapability::ComputeShaders: return "ComputeShaders";
-            case CNA::GraphicsCapability::IndirectDraw:   return "IndirectDraw";
         }
         return "(unknown)";
     }

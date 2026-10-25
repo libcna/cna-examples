@@ -9,11 +9,13 @@
 #include <vector>
 
 #include "Microsoft/Xna/Framework/Graphics/DepthStencilState.hpp"
+#include "Microsoft/Xna/Framework/Graphics/BufferUsage.hpp"
 #include "Microsoft/Xna/Framework/Graphics/PrimitiveType.hpp"
 #include "Microsoft/Xna/Framework/Graphics/RasterizerState.hpp"
 #include "Microsoft/Xna/Framework/Graphics/SkinnedEffect.hpp"
 #include "Microsoft/Xna/Framework/Graphics/Texture2D.hpp"
 #include "Microsoft/Xna/Framework/Graphics/VertexBuffer.hpp"
+#include "Microsoft/Xna/Framework/Graphics/VertexPositionNormalTextureSkinned.hpp"
 #include "Microsoft/Xna/Framework/Graphics/Viewport.hpp"
 #include "Microsoft/Xna/Framework/MathHelper.hpp"
 #include "Microsoft/Xna/Framework/Matrix.hpp"
@@ -26,33 +28,18 @@ namespace CnaExamples::Demos::Graphics3D::SkinnedEffectDemos {
 using namespace CnaExamples::GameStateManagement;
 using Microsoft::Xna::Framework::MathHelper;
 using Microsoft::Xna::Framework::Matrix;
+using Microsoft::Xna::Framework::Graphics::BufferUsage;
 using Microsoft::Xna::Framework::Graphics::DepthStencilState;
 using Microsoft::Xna::Framework::Graphics::PrimitiveType;
 using Microsoft::Xna::Framework::Graphics::RasterizerState;
 using Microsoft::Xna::Framework::Graphics::SkinnedEffect;
 using Microsoft::Xna::Framework::Graphics::Texture2D;
 using Microsoft::Xna::Framework::Graphics::VertexBuffer;
+using Microsoft::Xna::Framework::Graphics::VertexPositionNormalTextureSkinned;
 using Microsoft::Xna::Framework::Graphics::Viewport;
 
-// GPU-compact skinned vertex, matching the EasyGL stride-52 layout exactly
-// (Position/Normal/TextureCoordinate/BlendWeight/BlendIndices) -- built as a
-// raw struct (not VertexPositionNormalTextureSkinned) and uploaded via the
-// simple 2-arg VertexBuffer(device, count) constructor (empty
-// VertexDeclaration) + SetDataRaw(), mirroring cna/examples/
-// easygl_skinnedeffect_multilight_test.cpp exactly -- the one confirmed-
-// passing, real reference usage of SkinnedEffect on this backend found in
-// the whole codebase. An earlier version of this screen built on
-// VertexPositionNormalTextureSkinned + an explicitly-passed
-// VertexDeclaration (the generic Task-1080 per-element attribute-binding
-// path) and rendered NOTHING at all, with no exception and no error log,
-// verified repeatedly via Xvfb screenshots across many bisection attempts
-// (camera, lighting, indexed vs. non-indexed draw calls, PreferPerPixelLighting,
-// single- vs. multi-effect frames) -- every one of which still rendered
-// nothing until switching to this exact struct-plus-empty-declaration
-// shape. Left as a confirmed real, unresolved discrepancy between the
-// generic declaration-driven attribute path and the hardcoded stride-52
-// path for this specific effect; not chased further into the backend
-// internals given the disproportionate time already spent isolating it.
+// GPU-compact skinned vertex matching CNA's declared stride-52
+// Position/Normal/TextureCoordinate/BlendWeight/BlendIndices layout.
 struct SkinnedGpuVertex {
     float px, py, pz;
     float nx, ny, nz;
@@ -97,7 +84,9 @@ public:
             R_TL, R_BL, R_TR,  R_TR, R_BL, R_BR,
         };
         vertexCount_ = 12;
-        vb_.emplace(device, vertexCount_);
+        vb_.emplace(device,
+                    VertexPositionNormalTextureSkinned::getVertexDeclarationStatic(),
+                    vertexCount_, BufferUsage::None);
         vb_->SetDataRaw(verts, vertexCount_, (int)sizeof(SkinnedGpuVertex));
 
         texture_.emplace(CnaExamples::Demos::Graphics2D::CreateCheckerboardTexture(
