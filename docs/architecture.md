@@ -1,9 +1,9 @@
 # Architecture
 
 This document records the stable design decisions behind `cna-examples`. Current catalog counts,
-build commands, and verification results belong in [`README.md`](../README.md); the small set of
-open follow-up checks belongs in [`NEXT.md`](../NEXT.md). Completed roadmaps and investigation logs
-remain available in Git history rather than in active documentation.
+build commands, verification results, and outstanding validation gaps belong in
+[`README.md`](../README.md). Completed roadmaps and investigation logs remain available in Git
+history rather than in active documentation.
 
 ## Purpose and boundaries
 
@@ -120,7 +120,7 @@ behaviour:
 
 When a result is objectively measurable, prefer an on-screen verdict and a corresponding
 assertion over visual judgement alone. Hardware-dependent behaviour still needs a physical-device
-pass; the outstanding passes are listed in `NEXT.md`.
+pass; the outstanding passes are listed in README's verification status.
 
 ## Deliberate limits
 

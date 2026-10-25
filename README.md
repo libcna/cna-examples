@@ -10,7 +10,7 @@ Pick an area from the home menu, drill into a category, and run the demo — all
 application, on desktop, web or mobile.
 
 See [the architecture document](docs/architecture.md) for the stable design decisions behind the
-catalog. [NEXT.md](NEXT.md) contains only the current follow-up checks.
+catalog.
 
 ## Screenshot
 
@@ -189,7 +189,6 @@ needed (subject to CNA's own renderer maturity).
 ```
 cna-examples/
 ├── docs/architecture.md           Stable design decisions and project boundaries
-├── NEXT.md                        Current follow-up checks
 ├── CMakeLists.txt                 Top-level build (sibling add_subdirectory of ../cna)
 ├── Content/                       Menu font + UI textures + demo media
 │   ├── MediaDemo/                 ffmpeg-generated tones and a test video clip
