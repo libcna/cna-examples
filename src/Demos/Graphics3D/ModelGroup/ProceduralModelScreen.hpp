@@ -133,6 +133,7 @@ public:
         mesh_->getEffectsPropertyMutable().Add(&*effectB_);
 
         bone_.emplace(0, "Root");
+        mesh_->setParentBoneProperty(&*bone_);
 
         model_.emplace(&device, std::vector<ModelBone*>{&*bone_}, std::vector<ModelMesh*>{&*mesh_});
     }

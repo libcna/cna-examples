@@ -64,7 +64,8 @@ bool Throws(Fn&& fn) {
 int main() {
     // No service provider and no GraphicsDevice: this asset type needs neither,
     // which is itself part of the claim -- .cnj game data is not a GPU resource.
-    ContentManager cm(nullptr, "Content");
+    ContentManager cm;
+    cm.setRootDirectoryProperty("Content");
 
     cm.RegisterCnjLoader<GameplayRecord>(
         "EnemyDefinition",
