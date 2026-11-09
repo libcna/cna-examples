@@ -134,7 +134,7 @@ private:
             if (auto* root = library_->getRootPictureAlbumProperty()) {
                 rootAlbumName_ = root->getNameProperty();
             }
-            if (auto* source = library_->getMediaSourceProperty()) {
+            if (const auto source = library_->getMediaSourceProperty()) {
                 sourceName_ = source->getNameProperty();
                 sourceType_ = MediaSourceTypeName(source->getMediaSourceTypeProperty());
             }
