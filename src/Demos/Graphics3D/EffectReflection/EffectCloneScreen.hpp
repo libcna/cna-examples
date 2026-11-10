@@ -39,7 +39,7 @@ using Microsoft::Xna::Framework::Graphics::Effect;
 //     state, not per instance, so there is nothing per-instance to share.
 //   * ShaderEffect is the exception. It uniquely owns a compiled program, so
 //     its Clone() RECOMPILES from the same GLSL source instead of sharing.
-//     Genuine sharing would need a reference-counted backend, which that NOXNA
+//     Genuine sharing would need a reference-counted backend, which that CNAEXT
 //     extension deliberately does not have.
 //
 // The independence of the copied state is measured below, not assumed.

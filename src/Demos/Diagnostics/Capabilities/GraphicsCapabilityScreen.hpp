@@ -15,18 +15,18 @@ namespace CnaExamples::Demos::Diagnostics::CapabilitiesDemos {
 using namespace CnaExamples::GameStateManagement;
 using CnaExamples::Demos::DemoScreen;
 
-// CNA picks its graphics backend at COMPILE time (CNA_GRAPHICS_RENDERER), and
-// the backends genuinely differ in what they can do. SDL_RENDERER, DX3 and
-// CANVAS are 2D-only by design: every 3D call throws. Others lack MSAA, or
-// multiple render targets, or occlusion queries.
+// CNA picks its graphics renderer at COMPILE time (CNA_GRAPHICS_RENDERER), and
+// the renderers genuinely differ in what they can do. STUB reports no
+// capability at all; others lack MSAA, or multiple render targets, or
+// occlusion queries.
 //
 // GraphicsDevice::SupportsCapability is how an application asks instead of
 // finding out by exception. Each capability value maps to a real,
 // already-documented gap somewhere in CNA -- this is not a speculative list.
 //
-// This screen queries every capability live. It is also the screen that makes the
-// second-backend work meaningful: a build against SDL_RENDERER shows ThreeD
-// as unsupported here, and a catalog that gates on that reports honestly
+// This screen queries every capability live. It is also the screen that makes
+// second-renderer work meaningful: a build against STUB shows ThreeD as
+// unsupported here, and a catalog that gates on that reports honestly
 // instead of crashing.
 class GraphicsCapabilityScreen : public DemoScreen {
 public:

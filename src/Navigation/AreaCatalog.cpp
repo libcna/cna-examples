@@ -105,8 +105,9 @@ std::vector<AreaEntry> BuildAreaCatalog() {
                 CategoryEntry{"Dispose Safety", BuildDisposeSafetyDemos()},
             }},
         }},
-        // Every category here needs the 3D pipeline, which SDL_RENDERER, DX3
-        // and CANVAS do not have -- see Requiring()'s own comment.
+        // Every category here needs the 3D pipeline, which a renderer without
+        // GraphicsCapability::ThreeD (STUB, for one) does not have -- see
+        // Requiring()'s own comment.
         AreaEntry{"3D Graphics", {}, {
             GroupEntry{"Primitives & Vertex Types", {
                 CategoryEntry{"Vertex Types", Requiring(CNA::GraphicsCapability::ThreeD, BuildVertexTypesDemos())},

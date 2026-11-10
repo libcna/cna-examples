@@ -18,7 +18,7 @@ using Microsoft::Xna::Framework::Graphics::Texture2D;
 
 // Demonstrates a real PNG round trip -- SaveAsPng() is confirmed real and
 // round-trip-verified upstream (not a stub): a procedurally generated
-// texture is written to a real file, then reloaded via the NOXNA
+// texture is written to a real file, then reloaded via the CNAEXT
 // file-path constructor (which decodes it back through the same PNG
 // decoder any real asset would go through), and both are drawn side by
 // side.

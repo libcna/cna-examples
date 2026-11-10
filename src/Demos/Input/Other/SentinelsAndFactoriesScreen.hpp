@@ -10,6 +10,7 @@
 #include "Microsoft/Xna/Framework/Input/Touch/TouchLocation.hpp"
 #include "Microsoft/Xna/Framework/Input/Touch/TouchLocationState.hpp"
 #include "Microsoft/Xna/Framework/Input/Touch/TouchPanel.hpp"
+#include "System/NotSupportedException.hpp"
 
 #include "Demos/DemoScreen.hpp"
 
@@ -32,10 +33,12 @@ using Microsoft::Xna::Framework::Input::Touch::TouchPanel;
 //    it fails. It does not throw and does not leave the out-parameter alone, so
 //    code that ignores the return value gets a real TouchLocation object whose
 //    contents mean "not found". Its state is Invalid -- that is the tell.
+//    The collection itself is a read-only snapshot, as in XNA: it is built
+//    through its array constructor, and Add() throws NotSupportedException.
 //
 //  * TouchPanel::NO_FINGER is the "no such finger" id (-1). It is a real
 //    constant rather than a magic number precisely so this comparison is
-//    greppable; FNA declares it internal, CNA exposes it as NOXNA.
+//    greppable; FNA declares it internal, CNA exposes it as CNAEXT.
 //
 //  * GamePadButtons::FromButtonArray builds a button set from a list, which is
 //    the only sane way to construct one for a test or a replay -- the normal
@@ -61,6 +64,8 @@ protected:
                         ", state " + stateOfMissing_);
         lines.push_back("Ignore the return value and you still get a TouchLocation -- one whose");
         lines.push_back("state is Invalid. That is the tell; there is no exception.");
+        lines.push_back("Read-only snapshot: Add() " +
+                        std::string(addRefused_ ? "throws NotSupportedException." : "did NOT throw."));
         lines.emplace_back();
         lines.push_back("TouchPanel::NO_FINGER = " + std::to_string((int)TouchPanel::NO_FINGER) +
                         "  -- a named constant, not a magic -1, so it greps.");
@@ -102,10 +107,22 @@ private:
     }
 
     void RunChecks() {
-        // A collection built here, so this needs no touchscreen.
-        TouchCollection touches;
-        touches.Add(TouchLocation(7, TouchLocationState::Pressed, Vector2(120.0f, 80.0f)));
-        touches.Add(TouchLocation(9, TouchLocationState::Moved, Vector2(300.0f, 220.0f)));
+        // A collection built here, so this needs no touchscreen. TouchCollection
+        // is a read-only snapshot, so it is built through its array constructor.
+        const TouchCollection touches(std::vector<TouchLocation>{
+            TouchLocation(7, TouchLocationState::Pressed, Vector2(120.0f, 80.0f)),
+            TouchLocation(9, TouchLocationState::Moved, Vector2(300.0f, 220.0f)),
+        });
+
+        // Mutating it is refused rather than silently ignored.
+        TouchCollection copy = touches;
+        try {
+            copy.Add(TouchLocation(11, TouchLocationState::Pressed, Vector2(10.0f, 10.0f)));
+        } catch (const System::NotSupportedException&) {
+            addRefused_ = true;
+        }
+        Note(addRefused_ && copy.getCountProperty() == 2,
+             "TouchCollection::Add did not refuse the mutation");
 
         TouchLocation found(0, TouchLocationState::Invalid, Vector2(0.0f, 0.0f));
         foundExisting_ = touches.FindById(7, found);
@@ -140,6 +157,7 @@ private:
     bool allHold_ = true;
     bool foundExisting_ = false;
     bool foundAbsent_ = false;
+    bool addRefused_ = false;
     bool aPressed_ = false;
     bool xPressed_ = false;
     bool lbPressed_ = false;

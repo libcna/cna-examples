@@ -15,7 +15,7 @@ using namespace CnaExamples::GameStateManagement;
 using CNA::Input::SensorInfoEXT;
 using CNA::Input::Sensors;
 
-// Demonstrates the NOXNA/EXT CNA::Input::Sensors API: the host device's own
+// Demonstrates the CNAEXT/EXT CNA::Input::Sensors API: the host device's own
 // motion sensors (phone/tablet/laptop accelerometer and gyroscope) --
 // distinct from a gamepad's Get{Gyro,Accelerometer}EXT (see Gamepad's
 // DeviceInfo-adjacent demos) and from Microsoft::Devices::Sensors (the

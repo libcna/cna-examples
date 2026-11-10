@@ -27,7 +27,7 @@ using Microsoft::Xna::Framework::Media::Picture;
 // PictureAlbum -- i.e. the directory -- it was found in.
 //
 // XNA's Picture has no way to hand back pixels; the image is opened separately.
-// This screen does that with the picture's own NOXNA token (its path) and
+// This screen does that with the picture's own CNAEXT token (its path) and
 // Texture2D::FromStream, and draws the result, so the metadata on the left is
 // visibly the metadata of the image on the right.
 class PictureBrowserScreen : public LibraryDemoScreen {

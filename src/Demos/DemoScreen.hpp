@@ -9,6 +9,8 @@
 
 #include "CNA/GraphicsRendererType.hpp"
 #include "CNA/GraphicsCapability.hpp"
+#include "Microsoft/Xna/Framework/GamerServices/GamerServicesDispatcher.hpp"
+#include "Microsoft/Xna/Framework/GamerServices/Guide.hpp"
 #include "Microsoft/Xna/Framework/Rectangle.hpp"
 #include "Microsoft/Xna/Framework/Graphics/SpriteEffects.hpp"
 #include "Microsoft/Xna/Framework/Vector2.hpp"
@@ -43,17 +45,21 @@ public:
     void SetApis(std::vector<std::string> apis) { apis_ = std::move(apis); }
     void SetBreadcrumb(std::string breadcrumb) { breadcrumb_ = std::move(breadcrumb); }
 
-    // Marks this demo as needing a graphics capability the running backend may
-    // not have. CNA chooses its backend at compile time, and SDL_RENDERER, DX3
-    // and CANVAS are 2D-only by design -- every 3D call throws on them. A demo
-    // so marked is not run at all on a backend that lacks the capability; it
-    // explains itself instead.
+    // Marks this demo as needing a graphics capability the running renderer may
+    // not have. CNA chooses its renderer at compile time, and the renderers
+    // differ: STUB reports no capability at all, HEADLESS has no multisampling,
+    // and so on. A demo so marked is not run at all on a renderer that lacks the
+    // capability; it explains itself instead.
     //
     // Set at the catalog assembly site (see Requiring() in AreaCatalogInternal.hpp)
     // rather than inside each screen, so a whole category can be marked at once
-    // and no demo can forget.
-    void SetRequiredCapability(CNA::GraphicsCapability capability) {
-        requiredCapability_ = capability;
+    // and no demo can forget. Requirements accumulate: a demo in a ThreeD
+    // category can add one of its own, such as WireFrame.
+    void AddRequiredCapability(CNA::GraphicsCapability capability) {
+        if (std::find(requiredCapabilities_.begin(), requiredCapabilities_.end(), capability) ==
+            requiredCapabilities_.end()) {
+            requiredCapabilities_.push_back(capability);
+        }
     }
 
     // Shortens `text` with a trailing ellipsis until it measures no wider than
@@ -107,6 +113,14 @@ public:
     }
 
     void HandleInput(InputState& input) override {
+        // While a Guide screen (keyboard, message box, sign-in pane) is up, the
+        // Guide owns the input: Escape cancels it instead of leaving the demo.
+        namespace GamerServices = Microsoft::Xna::Framework::GamerServices;
+        if (GamerServices::GamerServicesDispatcher::getIsInitializedProperty() &&
+            GamerServices::Guide::getIsVisibleProperty()) {
+            return;
+        }
+
         PlayerIndex playerIndex;
         if (input.IsMenuCancel(ControllingPlayer(), playerIndex)) {
             ExitScreen();
@@ -314,26 +328,32 @@ private:
         OnDemoLoad();
     }
 
-    [[nodiscard]] bool CapabilityAvailable() const {
-        if (!requiredCapability_.has_value()) return true;
-        return GetScreenManager()->getGraphicsDeviceProperty().SupportsCapability(
-            requiredCapability_.value());
+    [[nodiscard]] bool CapabilityAvailable() const { return !MissingCapability().has_value(); }
+
+    // The first required capability the running renderer lacks, if any.
+    [[nodiscard]] std::optional<CNA::GraphicsCapability> MissingCapability() const {
+        for (const CNA::GraphicsCapability capability : requiredCapabilities_) {
+            if (!GetScreenManager()->getGraphicsDeviceProperty().SupportsCapability(capability)) {
+                return capability;
+            }
+        }
+        return std::nullopt;
     }
 
-    // Shown in place of the demo when the backend cannot run it. Naming the
-    // capability and the backend matters: "this demo does not work here" is not
-    // actionable, "this backend has no 3D pipeline by design" is.
+    // Shown in place of the demo when the renderer cannot run it. Naming the
+    // capability and the renderer matters: "this demo does not work here" is not
+    // actionable, "this renderer reports no 3D pipeline" is.
     void DrawUnavailable(SpriteBatch& spriteBatch, SpriteFont& font, float alpha) const {
         std::vector<std::string> lines;
         lines.push_back("Not available on this build.");
         lines.emplace_back();
-        lines.push_back("Requires GraphicsCapability::" + CapabilityName(requiredCapability_.value()));
+        lines.push_back("Requires GraphicsCapability::" + CapabilityName(MissingCapability().value()));
         lines.push_back("Renderer: " + std::string(CNA::getCurrentGraphicsRendererName()) +
                         "   (chosen at compile time via CNA_GRAPHICS_RENDERER)");
         lines.emplace_back();
-        lines.push_back("This is the backend behaving as designed, not a failure. SDL_RENDERER,");
-        lines.push_back("DX3 and CANVAS are 2D-only: their 3D entry points throw rather than");
-        lines.push_back("silently drawing nothing.");
+        lines.push_back("This is the renderer reporting its limits, not a failure. Without the");
+        lines.push_back("capability (STUB reports none at all) the demo would throw or draw");
+        lines.push_back("nothing, so it is not run.");
         lines.emplace_back();
         lines.push_back("The catalog asks GraphicsDevice::SupportsCapability before running a");
         lines.push_back("demo, which is what a real CNA application has to do too. See");
@@ -401,7 +421,7 @@ private:
     std::string title_;
     std::string breadcrumb_;
     std::vector<std::string> apis_;
-    std::optional<CNA::GraphicsCapability> requiredCapability_;
+    std::vector<CNA::GraphicsCapability> requiredCapabilities_;
     bool loaded_ = false;
 };
 

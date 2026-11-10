@@ -15,7 +15,7 @@ namespace CnaExamples::Demos::Input::GamepadDemos {
 using namespace CnaExamples::GameStateManagement;
 using Microsoft::Xna::Framework::Input::GamePad;
 
-// Demonstrates the NOXNA/EXT GetPlayerIndexEXT()/SetPlayerIndexEXT(): the
+// Demonstrates the CNAEXT/EXT GetPlayerIndexEXT()/SetPlayerIndexEXT(): the
 // controller's own player-number LED (the ring of lights an Xbox/PS pad
 // uses to show "you are player 2") -- distinct from the XNA PlayerIndex
 // slot this app is polling, which is just which USB/Bluetooth device CNA

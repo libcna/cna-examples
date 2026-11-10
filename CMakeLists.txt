@@ -12,14 +12,10 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 # selection, ...) is fully reused rather than duplicated here.
 # ---------------------------------------------------------------------------
 
-# OPENGLES3 is CNA's Linux default renderer and the successor to the old
-# EASYGL selection. A preset or -DCNA_GRAPHICS_RENDERER=<X> on the command
-# line still wins because CACHE variables set earlier on the command line are
-# not overwritten here.
-if(NOT DEFINED CNA_GRAPHICS_RENDERER)
-    set(CNA_GRAPHICS_RENDERER "OPENGLES3" CACHE STRING
-        "Graphics renderer to use (SDL_RENDERER, OPENGLES3, OPENGL33, VULKAN, WEBGPU, ...)")
-endif()
+# The graphics renderer is CNA's own CNA_GRAPHICS_RENDERER option, left to
+# CNA's per-platform default: WEBGL2 under Emscripten, SDLGPU on Windows,
+# macOS and iOS, OPENGLES3 everywhere else (Linux included). Pass
+# -DCNA_GRAPHICS_RENDERER=<X> to choose another of CNA's renderers.
 
 set(CNA_BUILD_TESTS           OFF CACHE BOOL "Build CNA tests"           FORCE)
 set(CNA_BUILD_EXAMPLES        OFF CACHE BOOL "Build CNA examples"        FORCE)

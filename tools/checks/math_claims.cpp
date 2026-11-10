@@ -6,9 +6,11 @@
 // This is not decoration. Writing it caught three claims that were confidently
 // wrong before anyone would have seen them:
 //
-//   1. "A sheared matrix cannot be decomposed" -- false. CNA's Matrix::Decompose
-//      returns TRUE for a shear and hands back parts that do not rebuild the
-//      original. It only returns false when a scale axis is ~zero.
+//   1. "A sheared matrix cannot be decomposed" -- only half true. CNA follows
+//      XNA 4.0: Matrix::Decompose refuses a strong shear, but a slight one
+//      passes its tolerance and returns TRUE with parts that do not rebuild
+//      the original. A zero scale axis is not refused either: it returns TRUE
+//      with a NaN rotation.
 //   2. "0.1f + 0.2f != 0.3f" -- false in SINGLE precision. That famous example
 //      is a double-precision result; in float the rounding coincides.
 //   3. "WithinEpsilon rescues the comparison" -- not for 0.3f + 0.6f vs 0.9f,
@@ -19,8 +21,8 @@
 //   FLAGS=$(grep -m1 CXX_INCLUDES build/CMakeFiles/cna_examples.dir/flags.make | sed 's/^CXX_INCLUDES = //')
 //   DEFS=$(grep -m1 CXX_DEFINES  build/CMakeFiles/cna_examples.dir/flags.make | sed 's/^CXX_DEFINES = //')
 //   LINK=$(sed 's|^/usr/bin/c++ .*-o cna_examples||' build/CMakeFiles/cna_examples.dir/link.txt)
-//   (cd build && g++ -std=c++23 $DEFS $FLAGS ../tools/checks/math_claims.cpp -o /tmp/math_claims $LINK)
-//   /tmp/math_claims
+//   (cd build && eval "g++ -std=c++23 $DEFS $FLAGS ../tools/checks/math_claims.cpp -o math_claims $LINK")
+//   (cd build && ./math_claims)
 #include <cmath>
 #include <cstdio>
 #include <vector>
@@ -60,22 +62,34 @@ int main() {
     const Vector3 tr = Vector3::Transform(Vector3::Zero, t * r);
     check("R*T != T*R", Vector3::Distance(rt, tr) > 0.5f);
 
-    // DecomposeAndInvertScreen: a shear cannot be decomposed.
-    Matrix sheared = Matrix::getIdentityProperty();
-    sheared.M21 = 0.7f;
-    Vector3 s, tr2; Quaternion q(0,0,0,1);
-    // Real rule: Decompose fails only on a ~zero scale axis, NOT on shear.
-    check("Decompose(shear) returns true (shear is not detected)",
-          sheared.Decompose(s, q, tr2) == true);
-    {   // ...and the parts it returns do not rebuild the sheared matrix.
+    // DecomposeAndInvertScreen: XNA's rule normalises the basis rows and
+    // refuses only when they are not orthonormal enough.
+    {   // A strong shear is refused, and rotation is reset to Identity.
+        Matrix sheared = Matrix::getIdentityProperty();
+        sheared.M21 = 0.7f;
+        Vector3 s, t2; Quaternion q(0.1f, 0.2f, 0.3f, 0.9f);
+        check("Decompose(shear M21=0.7) returns false",
+              sheared.Decompose(s, q, t2) == false);
+        check("refused Decompose sets rotation to Identity", q == Quaternion::Identity);
+    }
+    {   // A slight shear passes the tolerance...
+        Matrix sheared = Matrix::getIdentityProperty();
+        sheared.M21 = 0.05f;
+        Vector3 s, t2; Quaternion q(0,0,0,1);
+        check("Decompose(shear M21=0.05) returns true (not detected)",
+              sheared.Decompose(s, q, t2) == true);
+        // ...and the parts it returns do not rebuild the sheared matrix.
         const Matrix rebuilt = Matrix::CreateScale(s) * Matrix::CreateFromQuaternion(q) *
-                               Matrix::CreateTranslation(tr2);
-        check("shear: rebuilt-from-parts != original (best fit, not decomposition)",
+                               Matrix::CreateTranslation(t2);
+        check("slight shear: rebuilt-from-parts != original (best fit)",
               std::fabs(rebuilt.M21 - sheared.M21) > 1e-3f);
     }
-    {   Vector3 s2, t2; Quaternion q2(0,0,0,1);
-        check("Decompose(zero-scale axis) returns false",
-              Matrix::CreateScale(1.0f, 0.0f, 1.0f).Decompose(s2, q2, t2) == false);
+    {   // A zero scale axis is accepted: exact scale, NaN rotation.
+        Vector3 s2, t2; Quaternion q2(0,0,0,1);
+        check("Decompose(zero-scale axis) returns true",
+              Matrix::CreateScale(1.0f, 0.0f, 1.0f).Decompose(s2, q2, t2) == true);
+        check("zero-scale axis: scale is exact, rotation is NaN",
+              s2 == Vector3(1.0f, 0.0f, 1.0f) && std::isnan(q2.X) && std::isnan(q2.W));
     }
     check("Determinant(Scale(1,0,1)) == 0",
           std::fabs(Matrix::CreateScale(1.0f,0.0f,1.0f).Determinant()) < 1e-6f);

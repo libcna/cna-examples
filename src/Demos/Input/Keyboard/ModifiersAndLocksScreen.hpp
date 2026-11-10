@@ -16,7 +16,7 @@ using CnaExamples::Demos::DemoScreen;
 using CNA::Input::KeyModifiersEXT;
 using Microsoft::Xna::Framework::Input::Keyboard;
 
-// Demonstrates Keyboard::GetModStateEXT(), the NOXNA/EXT extension that
+// Demonstrates Keyboard::GetModStateEXT(), the CNAEXT/EXT extension that
 // reports held modifier keys (Shift/Ctrl/Alt/Gui) and toggled lock keys
 // (Caps/Num/Scroll) as a single bitflag snapshot, independent of tracking
 // individual Keys via IsKeyDown.

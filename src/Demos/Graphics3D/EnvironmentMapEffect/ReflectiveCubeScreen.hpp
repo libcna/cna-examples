@@ -71,9 +71,12 @@ inline void CreateSixColorEnvironmentMap(GraphicsDevice& device, int size, std::
 
 // Demonstrates EnvironmentMapEffect: a rotating cube fully reflecting
 // (EnvironmentMapAmount=1.0) the 6-distinct-color procedural cube map
-// above. Different faces show different reflected colors as the cube
-// spins, proving the reflection genuinely follows the cube's own
-// orientation/surface normals rather than being a fixed decal.
+// above. FresnelFactor defaults to 1, as in XNA, which fades the reflection
+// out on faces seen head-on; 0 switches that falloff off, so every face
+// reflects at full strength (the Amount & Fresnel screen varies both).
+// Different faces show different reflected colors as the cube spins, proving
+// the reflection genuinely follows the cube's own orientation/surface normals
+// rather than being a fixed decal.
 class ReflectiveCubeScreen : public DemoScreen {
 public:
     ReflectiveCubeScreen() : DemoScreen("EnvironmentMapEffect: Reflective Cube") {}
@@ -85,6 +88,7 @@ public:
         effect_.emplace(device);
         effect_->setEnvironmentMapProperty(&*envMap_);
         effect_->setEnvironmentMapAmountProperty(1.0f);
+        effect_->setFresnelFactorProperty(0.0f);
         effect_->setDiffuseColorProperty(Vector3(0.3f, 0.3f, 0.3f));
     }
 
@@ -101,8 +105,8 @@ protected:
     void OnDemoDraw(const GameTime&, SpriteBatch& sb, SpriteFont& font) override {
         std::vector<std::string> lines;
         lines.push_back("EnvironmentMapEffect.EnvironmentMap: a 6-distinct-color procedural");
-        lines.push_back("TextureCube, fully reflective (EnvironmentMapAmount=1.0). Different");
-        lines.push_back("faces show different reflected colors as the cube spins.");
+        lines.push_back("TextureCube, reflected at full strength (Amount=1.0, FresnelFactor=0).");
+        lines.push_back("Different faces show different reflected colors as the cube spins.");
         DrawLines(sb, font, Vector2(40.0f, 90.0f), lines, mul(Color::White, TransitionAlpha()));
 
         sb.End();

@@ -16,7 +16,7 @@ using namespace CnaExamples::GameStateManagement;
 using Microsoft::Xna::Framework::Input::Touch::TouchCollection;
 using Microsoft::Xna::Framework::Input::Touch::TouchPanel;
 
-// Demonstrates the NOXNA/EXT TouchDeviceExistsEXT flag alongside a simple
+// Demonstrates the CNAEXT/EXT TouchDeviceExistsEXT flag alongside a simple
 // derived metric this app computes itself (not a direct API call): the
 // peak number of simultaneous touches seen since this screen opened,
 // against TouchPanelCapabilities::MaximumTouchCount and

@@ -12,8 +12,8 @@
 //   FLAGS=$(grep -m1 CXX_INCLUDES build/CMakeFiles/cna_examples.dir/flags.make | sed 's/^CXX_INCLUDES = //')
 //   DEFS=$(grep -m1 CXX_DEFINES  build/CMakeFiles/cna_examples.dir/flags.make | sed 's/^CXX_DEFINES = //')
 //   LINK=$(sed 's|^/usr/bin/c++ .*-o cna_examples||' build/CMakeFiles/cna_examples.dir/link.txt)
-//   (cd build && g++ -std=c++23 $DEFS $FLAGS ../tools/checks/cnj_claims.cpp -o /tmp/cnj_claims $LINK)
-//   (cd build && /tmp/cnj_claims)      # must run where Content/ lives
+//   (cd build && eval "g++ -std=c++23 $DEFS $FLAGS ../tools/checks/cnj_claims.cpp -o cnj_claims $LINK")
+//   (cd build && ./cnj_claims)      # must run where Content/ lives
 
 #include <cstdio>
 #include <string>

@@ -17,7 +17,7 @@ using namespace CnaExamples::GameStateManagement;
 using CNA::Input::Joysticks;
 using JoystickHotplugToken = System::MulticastAction<std::uint32_t>::Token;
 
-// Demonstrates the NOXNA/EXT Joysticks::ConnectedEXT/DisconnectedEXT
+// Demonstrates the CNAEXT/EXT Joysticks::ConnectedEXT/DisconnectedEXT
 // hot-plug events: plug in or unplug a raw joystick/wheel/flight stick
 // while this screen is open to see it logged live. Same subscribe-in-
 // LoadContent/unsubscribe-in-UnloadContent lifetime discipline as every

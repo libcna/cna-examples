@@ -16,7 +16,7 @@ using namespace CnaExamples::GameStateManagement;
 using Microsoft::Xna::Framework::Graphics::Texture2D;
 
 // Demonstrates the two ways to build a Texture2D with no bundled PNG asset:
-// the NOXNA Texture2D::CreateFromPixels() one-liner (real XNA has no such
+// the CNAEXT Texture2D::CreateFromPixels() one-liner (real XNA has no such
 // constructor at all -- this is CNA's raw-pixel-buffer escape hatch) versus
 // the XNA-idiomatic Texture2D(device, w, h) + SetData(Color*, count)
 // pattern. Both build the exact same gradient; only the construction path
@@ -30,7 +30,7 @@ public:
     void OnDemoLoad() override {
         auto& device = GetScreenManager()->getGraphicsDeviceProperty();
 
-        // (a) NOXNA CreateFromPixels() -- fed a hand-built RGBA byte buffer.
+        // (a) CNAEXT CreateFromPixels() -- fed a hand-built RGBA byte buffer.
         viaPixels_.emplace(CreateGradientTexture(device, kSize, kSize,
                                                   Color(255, 80, 80, 255), Color(80, 80, 255, 255)));
 
@@ -60,7 +60,7 @@ protected:
         const Color tint = mul(Color::White, TransitionAlpha());
 
         sb.Draw(*viaPixels_, Vector2(40.0f, end.Y + 20.0f), tint);
-        sb.DrawString(font, "CreateFromPixels (NOXNA)", Vector2(40.0f, end.Y + 20.0f + kSize + 6.0f), tint);
+        sb.DrawString(font, "CreateFromPixels (CNAEXT)", Vector2(40.0f, end.Y + 20.0f + kSize + 6.0f), tint);
 
         const float row2Y = end.Y + 20.0f + kSize + 40.0f;
         sb.Draw(*viaSetData_, Vector2(40.0f, row2Y), tint);

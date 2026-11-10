@@ -11,7 +11,7 @@
 #include "Microsoft/Xna/Framework/GamerServices/LeaderboardWriter.hpp"
 #include "Microsoft/Xna/Framework/GamerServices/SignedInGamer.hpp"
 #include "Microsoft/Xna/Framework/GamerServices/SignedInGamerCollection.hpp"
-#include "System/NotSupportedException.hpp"
+#include "Microsoft/Xna/Framework/GamerServices/GamerServicesNotAvailableException.hpp"
 
 #include "Demos/Net/SignedInGamerDemoScreen.hpp"
 
@@ -19,15 +19,16 @@ namespace CnaExamples::Demos::Net::LeaderboardsDemos {
 
 using namespace CnaExamples::GameStateManagement;
 using Microsoft::Xna::Framework::GamerServices::Gamer;
+using Microsoft::Xna::Framework::GamerServices::GamerServicesNotAvailableException;
 using Microsoft::Xna::Framework::GamerServices::LeaderboardEntry;
 using Microsoft::Xna::Framework::GamerServices::LeaderboardIdentity;
 using Microsoft::Xna::Framework::GamerServices::LeaderboardKey;
 using Microsoft::Xna::Framework::GamerServices::SignedInGamer;
 
 // Demonstrates LeaderboardEntry (Columns/Gamer/Rating/RankingEXT -- a real, working value
-// type once constructed) alongside Gamer::LeaderboardWriter::GetLeaderboard(), which always
-// throws NotSupportedException on this platform (same stub-API-surface reasoning as
-// LeaderboardReaderScreen -- there is no leaderboard backend to write to).
+// type once constructed) alongside Gamer::LeaderboardWriter::GetLeaderboard(), which returns
+// the writer's own mutable entry for a leaderboard. The entry belongs to the writer and stays
+// valid until its gamer goes away; this screen only reads it.
 class LeaderboardWriterScreen : public SignedInGamerDemoScreen {
 public:
     LeaderboardWriterScreen() : SignedInGamerDemoScreen("Leaderboards: LeaderboardWriter") {}
@@ -45,11 +46,16 @@ protected:
             writeAttempts_++;
             try {
                 LeaderboardIdentity identity = LeaderboardIdentity::Create(LeaderboardKey::BestScoreLifeTime);
-                LeaderboardEntry* unused = gamer_->getLeaderboardWriterProperty().GetLeaderboard(identity);
-                (void)unused;
-                lastResult_ = "GetLeaderboard() returned without throwing (unexpected)";
-            } catch (const System::NotSupportedException& ex) {
-                lastResult_ = std::string("GetLeaderboard() threw NotSupportedException: ") + ex.getMessageProperty();
+                const LeaderboardEntry* own = gamer_->getLeaderboardWriterProperty().GetLeaderboard(identity);
+                lastResult_ = own == nullptr
+                    ? std::string("GetLeaderboard() returned no entry")
+                    : "GetLeaderboard() returned " +
+                          (own->getGamerProperty() != nullptr ? own->getGamerProperty()->getGamertagProperty()
+                                                              : std::string("?")) +
+                          "'s entry, Rating " + std::to_string(own->getRatingProperty());
+            } catch (const GamerServicesNotAvailableException& ex) {
+                lastResult_ = "GetLeaderboard() threw GamerServicesNotAvailableException: " +
+                              ex.getMessageProperty();
             }
         }
     }

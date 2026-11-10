@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 
+#include "CNA/Platform/PlatformException.hpp"
 #include "Microsoft/Xna/Framework/Input/Mouse.hpp"
 #include "Microsoft/Xna/Framework/Input/MouseState.hpp"
 
@@ -15,26 +16,28 @@ using namespace CnaExamples::GameStateManagement;
 using Microsoft::Xna::Framework::Input::Mouse;
 using Microsoft::Xna::Framework::Input::MouseState;
 
-// Demonstrates the NOXNA/EXT IsRelativeMouseModeEXT toggle: normally
+// Demonstrates the CNAEXT/EXT IsRelativeMouseModeEXT toggle: normally
 // MouseState.X/Y report an absolute, window-relative position; in relative
 // mode (typical for a first-person camera) the same fields instead report
 // per-frame motion deltas, and the OS cursor is hidden/confined. Space/
 // Enter/A/tap toggles it. Always restored to false on exit (UnloadContent)
 // so leaving this screen doesn't leave the whole app's cursor behavior
-// altered.
+// altered. A video driver without relative mode (SDL's offscreen driver, for
+// one) refuses with CNA::Platform::PlatformException; the screen reports that
+// instead of failing.
 class RelativeModeScreen : public DemoScreen {
 public:
     RelativeModeScreen() : DemoScreen("Mouse: Relative Mode (EXT)") {}
 
     void OnDemoUnload() override {
-        Mouse::setIsRelativeMouseModeEXTProperty(false);
+        if (Mouse::getIsRelativeMouseModeEXTProperty()) TrySetRelative(false);
     }
 
 protected:
     void OnDemoInput(InputState& input) override {
         PlayerIndex playerIndex;
         if (input.IsMenuSelect(ControllingPlayer(), playerIndex)) {
-            Mouse::setIsRelativeMouseModeEXTProperty(!Mouse::getIsRelativeMouseModeEXTProperty());
+            TrySetRelative(!Mouse::getIsRelativeMouseModeEXTProperty());
         }
     }
 
@@ -51,9 +54,25 @@ protected:
                         (relative ? "per-frame motion DELTA" : "absolute position"));
         lines.push_back("X, Y: (" + std::to_string(state.getXProperty()) + ", " +
                         std::to_string(state.getYProperty()) + ")");
+        if (!refusal_.empty()) {
+            lines.emplace_back();
+            lines.push_back("This platform refused relative mode:");
+            lines.push_back("  " + refusal_);
+        }
 
         DrawLines(sb, font, Vector2(40.0f, 90.0f), lines, mul(Color::White, TransitionAlpha()));
     }
+
+private:
+    void TrySetRelative(bool enabled) {
+        try {
+            Mouse::setIsRelativeMouseModeEXTProperty(enabled);
+        } catch (const CNA::Platform::PlatformException& ex) {
+            refusal_ = ex.what();
+        }
+    }
+
+    std::string refusal_;
 };
 
 } // namespace CnaExamples::Demos::Input::MouseDemos

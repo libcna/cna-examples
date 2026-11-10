@@ -89,7 +89,7 @@ protected:
         lines.push_back("1.0 -- comparing much larger or smaller magnitudes needs a relative one.");
         lines.emplace_back();
         lines.push_back("  ClosestMSAAPower(5) = " + std::to_string(MathHelper::ClosestMSAAPower(5)) +
-                        "   (NOXNA: rounds a requested sample count to a legal one)");
+                        "   (CNAEXT: rounds a requested sample count to a legal one)");
 
         DrawLines(sb, font, Vector2(40.0f, 82.0f), lines, mul(Color::White, TransitionAlpha()));
     }

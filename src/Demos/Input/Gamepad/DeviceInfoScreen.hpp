@@ -18,7 +18,7 @@ using namespace CnaExamples::GameStateManagement;
 using CNA::Input::GamePadConnectionStateEXT;
 using Microsoft::Xna::Framework::Input::GamePad;
 
-// A combined "device info sheet" for several read-only NOXNA/EXT getters
+// A combined "device info sheet" for several read-only CNAEXT/EXT getters
 // that each don't warrant a whole screen of their own: GUID, device path,
 // serial number, firmware version, Steam Input handle, wired/wireless
 // connection state, touchpad count, and the A button's printed glyph label

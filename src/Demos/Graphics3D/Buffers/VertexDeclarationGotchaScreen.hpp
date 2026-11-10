@@ -27,27 +27,19 @@ using Microsoft::Xna::Framework::Graphics::PrimitiveType;
 using Microsoft::Xna::Framework::Graphics::RasterizerState;
 using Microsoft::Xna::Framework::Graphics::Viewport;
 
-// Demonstrates a REAL, confirmed silent-corruption trap (traced end to end
-// through GraphicsDevice::DrawUserIndexedPrimitives and EasyGL's
-// ApplyLayout() stride-dispatch switch before writing this screen): the
-// generic void*+VertexDeclaration overload uploads raw bytes at whatever
-// stride the passed VertexDeclaration reports -- but
-// VertexPositionColor::getVertexDeclarationStatic() reports
-// sizeof(VertexPositionColor) as that stride, which in this C++ build is
-// 40 bytes (Color gained virtual bases -- IPackedVector + IEquatable --
-// long after XNA's tightly-packed 16-byte layout), NOT one of EasyGL's
-// backend-recognized strides (16/20/24/32/48/52/56/68). An unrecognized
-// stride falls into ApplyLayout()'s default case (EasyGLGraphicsBackend
-// .cpp's ApplyLayout(), "unknown stride" branch), which enables ONLY the
-// Position attribute -- Color is never enabled at all, so the shader reads
-// OpenGL's default generic-attribute value for it, which renders as solid
-// black. Verified live: the "unsafe" cube on the right renders completely
-// invisible against this screen's black background -- not just
-// "wrong-looking", genuinely vanished, no exception, no error log above
-// debug level. The fix is simple: never pair a typed vertex struct's own
-// declaration with the raw void*+VertexDeclaration overload -- use the
-// dedicated typed overload instead (which re-packs to a compact,
-// recognized GPU layout internally).
+// Demonstrates why a vertex declaration's stride is not sizeof() of the C++
+// vertex structure. CNA's stock vertex types are polymorphic C++ objects
+// (IVertexType gives them a vtable, and Color is a 16-byte object here rather
+// than XNA's 4-byte value), so sizeof(VertexPositionColor) is larger than the
+// 16-byte GPU stream XNA defines. VertexPositionColor's VertexDeclaration
+// describes that GPU stream, not the C++ object.
+//
+// Both cubes draw the same vertices. The left one uses the typed overload; the
+// right one passes VertexPositionColor's own declaration as well. CNA converts
+// the values into the stream that declaration describes, so the two match.
+// The trap that remains is a custom vertex structure embedding a Color: it is
+// not trivially copyable, so the declaration-taking overload refuses it at
+// compile time. Store the colour's packed std::uint32_t value instead.
 class VertexDeclarationGotchaScreen : public DemoScreen {
 public:
     VertexDeclarationGotchaScreen() : DemoScreen("Buffers: VertexDeclaration Stride Gotcha") {}
@@ -73,10 +65,12 @@ protected:
 
     void OnDemoDraw(const GameTime&, SpriteBatch& sb, SpriteFont& font) override {
         std::vector<std::string> lines;
-        lines.push_back("Left: safe typed DrawUserIndexedPrimitives(VertexPositionColor*, ...).");
-        lines.push_back("Right: the SAME data via the raw void*+VertexDeclaration overload, using");
-        lines.push_back("VertexPositionColor's OWN declaration -- its stride (40, C++-bloated) is");
-        lines.push_back("unrecognized, so Color is never enabled -- the cube silently VANISHES.");
+        const int stride = VertexPositionColor::getVertexDeclarationStatic().getVertexStrideProperty();
+        lines.push_back("Left: typed DrawUserIndexedPrimitives(VertexPositionColor*, ...).");
+        lines.push_back("Right: the SAME data plus VertexPositionColor's own VertexDeclaration.");
+        lines.push_back("sizeof(VertexPositionColor) = " + std::to_string(sizeof(VertexPositionColor)) +
+                        " bytes, declared stride = " + std::to_string(stride) + ".");
+        lines.push_back("The declaration describes the GPU stream, not the C++ object.");
         const Vector2 end = DrawLines(sb, font, Vector2(40.0f, 90.0f), lines, mul(Color::White, TransitionAlpha()));
 
         sb.End();
@@ -93,14 +87,15 @@ protected:
             MathHelper::PiOver4, (float)scene.getWidthProperty() / (float)scene.getHeightProperty(), 0.1f, 100.0f);
         const Matrix spin = Matrix::CreateRotationY(spin_);
 
-        // Safe: the typed overload re-packs to a compact, recognized layout.
+        // The typed overload packs the values into the stock GPU stream.
         effect_->World = Matrix::CreateTranslation(-1.4f, 0.0f, 0.0f) * spin;
         effect_->Apply();
         device.DrawUserIndexedPrimitives(PrimitiveType::TriangleList, mesh_.vertices.data(), 0,
                                          (int)mesh_.vertices.size(), mesh_.indices.data(), 0,
                                          (int)mesh_.indices.size() / 3);
 
-        // Unsafe: raw bytes at VertexPositionColor's OWN (bloated, unrecognized) stride.
+        // With the type's own declaration the values are converted into the
+        // stream it describes, never read as raw C++ object bytes.
         effect_->World = Matrix::CreateTranslation(1.4f, 0.0f, 0.0f) * spin;
         effect_->Apply();
         device.DrawUserIndexedPrimitives(PrimitiveType::TriangleList, mesh_.vertices.data(), 0,
@@ -114,8 +109,8 @@ protected:
         sb.Begin();
 
         const Color tint = mul(Color::White, TransitionAlpha());
-        sb.DrawString(font, "Typed overload (correct)", Vector2(40.0f, (float)original.getHeightProperty() - 60.0f), tint);
-        sb.DrawString(font, "Raw+VertexDecl (vanished!)",
+        sb.DrawString(font, "Typed overload", Vector2(40.0f, (float)original.getHeightProperty() - 60.0f), tint);
+        sb.DrawString(font, "+ its VertexDeclaration",
                       Vector2(540.0f, (float)original.getHeightProperty() - 60.0f), tint);
     }
 

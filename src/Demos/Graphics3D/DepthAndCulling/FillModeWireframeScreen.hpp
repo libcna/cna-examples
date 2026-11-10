@@ -32,9 +32,11 @@ using Microsoft::Xna::Framework::Graphics::PrimitiveType;
 using Microsoft::Xna::Framework::Graphics::RasterizerState;
 using Microsoft::Xna::Framework::Graphics::Viewport;
 
-// Demonstrates RasterizerState.FillMode -- confirmed real and functional on
-// this backend (not vestigial): a spinning cube toggles between Solid and
-// WireFrame via Space/Enter/A. The 3 static RasterizerState presets
+// Demonstrates RasterizerState.FillMode: a spinning cube toggles between Solid
+// and WireFrame via Space/Enter/A. WireFrame is a capability of its own
+// (GraphicsCapability::WireFrame): an OpenGL ES context without
+// GL_NV_polygon_mode cannot draw it and CNA refuses the draw, so the catalog
+// runs this screen only where the renderer reports the capability. The 3 static RasterizerState presets
 // (CullClockwise/CullCounterClockwise/CullNone) have no WireFrame variant,
 // so a fresh RasterizerState is built by hand for the WireFrame case.
 //

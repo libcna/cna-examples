@@ -259,7 +259,7 @@ public:
                IsNewButtonPress(Buttons::LeftThumbstickDown, controllingPlayer, playerIndex);
     }
 
-    // NOXNA-style extension (not part of the original sample): reports a
+    // CNAEXT-style extension (not part of the original sample): reports a
     // newly-began touch this frame, if any. TouchLocationState::Pressed is
     // only reported on the first frame of a contact, so no extra "new vs.
     // held" bookkeeping is needed beyond re-checking it every Update().
@@ -270,7 +270,7 @@ public:
         return true;
     }
 
-    // NOXNA-style extension: reports a newly-pressed left mouse button this
+    // CNAEXT-style extension: reports a newly-pressed left mouse button this
     // frame, if any, at the cursor's window-relative position -- the mouse
     // equivalent of IsNewTap(), so desktop users can click a menu entry the
     // same way touch users tap one (see MenuScreen::HandleInput).

@@ -14,7 +14,7 @@ namespace CnaExamples::Demos::Input::MouseDemos {
 using namespace CnaExamples::GameStateManagement;
 using Microsoft::Xna::Framework::Input::Mouse;
 
-// Demonstrates the NOXNA/EXT SetCaptureEXT(): while captured, mouse events
+// Demonstrates the CNAEXT/EXT SetCaptureEXT(): while captured, mouse events
 // keep being delivered even if the cursor leaves the window bounds (useful
 // for click-drag interactions that shouldn't stop at the window edge).
 // Space/Enter/A/tap toggles it; always released on exit (UnloadContent) so

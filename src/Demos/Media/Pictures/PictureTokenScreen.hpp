@@ -18,7 +18,7 @@ using Microsoft::Xna::Framework::Media::Picture;
 
 // A "token" is XNA's opaque handle for a picture that outlives a MediaLibrary
 // instance: you keep the string, and later ask a library to hand the Picture
-// back. In CNA the token is the file's path (exposed as the NOXNA getTokenEXT()),
+// back. In CNA the token is the file's path (exposed as the CNAEXT getTokenEXT()),
 // but the round trip below only ever uses it as an opaque string, which is how
 // consumer code should treat it.
 //

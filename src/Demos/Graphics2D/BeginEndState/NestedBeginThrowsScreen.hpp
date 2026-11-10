@@ -1,9 +1,10 @@
 // SPDX-License-Identifier: MIT
 #pragma once
 
-#include <stdexcept>
 #include <string>
 #include <vector>
+
+#include "System/InvalidOperationException.hpp"
 
 #include "Demos/DemoScreen.hpp"
 
@@ -12,8 +13,8 @@ namespace CnaExamples::Demos::Graphics2D::BeginEndStateDemos {
 using namespace CnaExamples::GameStateManagement;
 
 // Demonstrates that calling SpriteBatch::Begin() a second time before
-// End() throws std::runtime_error("Begin has been called before calling
-// End."). OnDemoInput can't touch `sb` directly (it isn't passed there),
+// End() throws InvalidOperationException, as in XNA ("Begin cannot be called
+// again until End has been successfully called."). OnDemoInput can't touch `sb` directly (it isn't passed there),
 // so a pending-attempt flag defers the actual Begin/End manipulation into
 // OnDemoDraw, where `sb` is available.
 class NestedBeginThrowsScreen : public DemoScreen {
@@ -37,8 +38,9 @@ protected:
             try {
                 sb.Begin(); // nested -- should throw
                 lastResult_ = "nested Begin() returned without throwing (unexpected)";
-            } catch (const std::runtime_error& ex) {
-                lastResult_ = std::string("nested Begin() threw: ") + ex.what();
+            } catch (const System::InvalidOperationException& ex) {
+                lastResult_ = "nested Begin() threw InvalidOperationException: " +
+                              ex.getMessageProperty();
             }
             sb.End();   // close the still-open first Begin()
             sb.Begin(); // reopen a default batch for the rest of this frame

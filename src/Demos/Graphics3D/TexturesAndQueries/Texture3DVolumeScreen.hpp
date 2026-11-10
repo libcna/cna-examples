@@ -59,11 +59,11 @@ protected:
         std::vector<std::string> lines;
 
         if (!error_.empty()) {
-            lines.push_back("Texture3D is not available on this backend:");
+            lines.push_back("Texture3D is not available on this renderer:");
             lines.push_back("  " + error_);
             lines.emplace_back();
-            lines.push_back("A volume texture needs a 3D-capable device. The 2D-only backends");
-            lines.push_back("(SDL_RENDERER, DX3, CANVAS) refuse it rather than pretending.");
+            lines.push_back("A volume texture needs a 3D-capable device. A renderer without");
+            lines.push_back("GraphicsCapability::Texture3D refuses it rather than pretending.");
             DrawLines(sb, font, Vector2(40.0f, 82.0f), lines, tint);
             return;
         }

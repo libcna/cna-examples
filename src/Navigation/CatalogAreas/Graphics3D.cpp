@@ -76,7 +76,7 @@ std::vector<DemoEntry> BuildBuffersDemos() {
     demos.push_back(MakeDemo<DynamicVertexBufferScreen>(
         "DynamicVertexBuffer Ripple", "A 12x12 grid re-uploaded via SetData(..., Discard) every frame"));
     demos.push_back(MakeDemo<VertexDeclarationGotchaScreen>(
-        "VertexDeclaration Stride Gotcha", "A confirmed real bug: an unrecognized stride silently drops color"));
+        "VertexDeclaration Stride Gotcha", "sizeof(VertexPositionColor) is not its declared GPU stride"));
     return demos;
 }
 
@@ -175,8 +175,12 @@ std::vector<DemoEntry> BuildDepthAndCullingDemos() {
         "DepthStencilState: Default vs. None", "2 overlapping cubes; toggling depth testing changes what occludes what"));
     demos.push_back(MakeDemo<CullModeScreen>(
         "RasterizerState: CullMode", "A spinning quad, cycling CullNone/CullClockwise/CullCounterClockwise"));
-    demos.push_back(MakeDemo<FillModeWireframeScreen>(
-        "RasterizerState: FillMode", "Solid vs. WireFrame toggle on a lit cube"));
+    // FillMode::WireFrame is a capability of its own: GLES has no polygon mode
+    // without GL_NV_polygon_mode, so OPENGLES3 may report it unsupported.
+    for (auto& demo : Requiring(CNA::GraphicsCapability::WireFrame, {MakeDemo<FillModeWireframeScreen>(
+             "RasterizerState: FillMode", "Solid vs. WireFrame toggle on a lit cube")})) {
+        demos.push_back(std::move(demo));
+    }
     return demos;
 }
 
@@ -203,7 +207,7 @@ std::vector<DemoEntry> BuildModelGroupDemos() {
         {"Model", "ModelMesh", "ModelMeshPart", "ContentManager"}));
     demos.push_back(MakeDemo<ModelEffectMaterialScreen>(
         "EffectMaterial & Effect Swapping",
-        "EffectMaterial is never built by either content reader; live part.Effect swap done right",
+        "EffectMaterial built by hand and cloned; live part.Effect swap done right",
         {"EffectMaterial", "Effect", "ModelMeshPart"}));
     demos.push_back(MakeDemo<ModelAnimationPlayerScreen>(
         "Skeletal Animation (AnimationPlayer)",
@@ -243,7 +247,7 @@ std::vector<DemoEntry> BuildEffectReflectionDemos() {
     std::vector<DemoEntry> demos;
     demos.push_back(MakeDemo<ReflectionSurfaceScreen>(
         "What Is Actually Exposed",
-        "Parameters/Techniques measured live -- and why Parameters[\"World\"] is null here",
+        "Parameters/Techniques measured live, and what a missing name returns",
         {"Effect", "EffectParameterCollection", "EffectTechnique"}));
     demos.push_back(MakeDemo<EffectParameterScreen>(
         "Parameter Classes, Types & Values",

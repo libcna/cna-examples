@@ -58,17 +58,19 @@ registrations in `src/Navigation/CatalogAreas/`.
 - **Self-checking screens:** the 3D area's Volume & Cube Textures screens compute their own
   pass/fail (a `GetData` round trip, an occluded-vs-visible pixel count) and draw the verdict as
   a coloured swatch, so a sweep can assert correctness by pixel rather than by "it rendered".
-  That is how `RenderTargetCube::GetData` was found to return zeros silently on EASYGL.
+  That is how `RenderTargetCube::GetData` was found to return zeros silently on EasyGL.
 - **Renders correctly and degrades gracefully, but never exercised with the real device:**
   Gamepad, Touch, and Input's joystick/haptics screens (no controller, touchscreen, raw joystick
   or haptic device available); Devices' mobile-only Sensors/Vibration screens; Camera
   (no webcam); MessageBox/FileDialog (need a human).
-- **Renderers:** The 2026-09-28 `OPENGLES3` sweep produced 248/248 screenshots with no blank or
-  overflowing screen. `SDL_RENDERER` was verified before the catalog changed from 249 to 248;
-  its current catalog needs a fresh sweep.
-  `SDL_RENDERER` is 2D-only by design, so the 3D Graphics area is gated on
-  `GraphicsDevice::SupportsCapability(ThreeD)` and those demos explain themselves rather than
-  throwing. See [Renderer capability gating](docs/architecture.md#renderer-capability-gating).
+- **Renderers:** On 2026-11-10 the `OPENGLES3` sweep (Mesa OpenGL ES 3.2, SDL's offscreen
+  driver) produced 248/248 screenshots with no blank or overflowing screen, and a second pass
+  that presses Select twice and then Back in every demo (`--keys select,select,cancel`) ran all
+  248 without a failure. That OpenGL ES context has no polygon mode, so the FillMode demo reports
+  `GraphicsCapability::WireFrame` as missing instead of running. Every current CNA renderer
+  except `STUB` reports `ThreeD`; the 3D Graphics area stays gated on
+  `GraphicsDevice::SupportsCapability(ThreeD)` so that a renderer without it explains itself
+  rather than throwing. See [Renderer capability gating](docs/architecture.md#renderer-capability-gating).
 - **Web:** An Emscripten `WEBGL2` build linked on 2026-10-01. Its Node CLI listed 245 demos;
   the three Video demos are omitted because CNA disables video in this configuration.
   Browser rendering still needs a browser run. The native Avatars sweep passed 7/7 after
@@ -110,7 +112,7 @@ tools/sweep.sh                 # screenshot every demo
 tools/sweep.sh Media           # ...or just the ones matching a filter
 tools/check_shots.py build/screenshots   # flag blank/overflowing screens
 
-# Run against an existing second-backend build tree when one is available:
+# Run against an existing second-renderer build tree when one is available:
 tools/sweep_backend.sh <build-dir>
 ```
 
@@ -130,13 +132,16 @@ tools/sweep_backend.sh <build-dir>
 | C++ compiler | C++23 (GCC 13+, Clang 16+, MSVC 19.38+) |
 | CNA | sibling directory `../cna` |
 | sharp-runtime | sibling directory `../sharp-runtime` |
+| easy-gl, meta-gl | sibling directories `../easy-gl`, `../meta-gl` (CNA's GL renderers) |
 
-Clone all three side-by-side:
+Clone them side-by-side:
 
 ```
 libcna/
 ├── cna/
 ├── sharp-runtime/
+├── easy-gl/
+├── meta-gl/
 └── cna-examples/       ← this repo
 ```
 
@@ -180,9 +185,9 @@ python3 -m http.server 8000 --directory build-web
 
 Open `http://localhost:8000/cna_examples.html` in a browser to test rendering.
 
-The graphics renderer defaults to `OPENGLES3` (CNA's EasyGL implementation); override with
-`-DCNA_GRAPHICS_RENDERER=<SDL_RENDERER|OPENGLES2|OPENGLES3|OPENGL33|VULKAN|BGFX|WEBGPU>` if
-needed (subject to CNA's own renderer maturity).
+The graphics renderer is CNA's per-platform default: `OPENGLES3` on Linux, `SDLGPU` on Windows
+and macOS, `WEBGL2` under Emscripten. Override it with `-DCNA_GRAPHICS_RENDERER=<renderer>`, for
+example `OPENGL33`, `SDLGPU` or `WEBGPU` (subject to CNA's own renderer maturity).
 
 ## Project structure
 
@@ -198,7 +203,7 @@ cna-examples/
 │   ├── gen_media_library.sh       Regenerates Content/MediaLibraryDemo/
 │   ├── headless.sh                Run one demo with SDL's offscreen driver
 │   ├── sweep.sh                   Screenshot every demo
-│   ├── sweep_backend.sh           ...from a non-default build tree (a second backend)
+│   ├── sweep_backend.sh           ...from a non-default build tree (a second renderer)
 │   ├── check_shots.py             Flag blank or overflowing screenshots
 │   ├── check_layout.py            Flag hardcoded bottom-of-window draw positions
 │   ├── check_catalog.py           Screens vs registrations vs docs consistency

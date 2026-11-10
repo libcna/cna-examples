@@ -68,7 +68,7 @@ inline std::string FormatDuration(const System::TimeSpan& span) {
 // roots at the small synthetic library under Content/MediaLibraryDemo/ first.
 //
 // The redirect uses CNA::Internal::Media::MediaLibraryPaths::Set*RootOverride(),
-// which is a NOXNA test hook, NOT part of the XNA 4.0 surface -- real XNA has no
+// which is a CNAEXT test hook, NOT part of the XNA 4.0 surface -- real XNA has no
 // way to say "index this folder instead". The demos say so on screen rather than
 // presenting it as normal API usage, and CatalogAccessScreen lets the user flip
 // back to the real OS roots to see what the unredirected API actually returns.

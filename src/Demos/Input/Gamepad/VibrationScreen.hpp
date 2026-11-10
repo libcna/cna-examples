@@ -15,7 +15,7 @@ namespace CnaExamples::Demos::Input::GamepadDemos {
 using namespace CnaExamples::GameStateManagement;
 using Microsoft::Xna::Framework::Input::GamePad;
 
-// Demonstrates GamePad::SetVibration() and the NOXNA/EXT
+// Demonstrates GamePad::SetVibration() and the CNAEXT/EXT
 // SetTriggerVibrationEXT(): Space/Enter/A/tap pulses both motor pairs at
 // full strength for one second, then stops them. Always stops vibration on
 // exit (UnloadContent) so leaving this screen doesn't leave a controller

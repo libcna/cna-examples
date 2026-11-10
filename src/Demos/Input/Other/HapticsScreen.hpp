@@ -15,7 +15,7 @@ using namespace CnaExamples::GameStateManagement;
 using CNA::Input::HapticInfoEXT;
 using CNA::Input::Haptics;
 
-// Demonstrates the NOXNA/EXT CNA::Input::Haptics API: force-feedback
+// Demonstrates the CNAEXT/EXT CNA::Input::Haptics API: force-feedback
 // devices richer than GamePad::SetVibration's simple dual-motor rumble
 // (real wheels/HOTAS setups with dedicated actuators). Shows enumeration
 // and the two capability-check helpers; does not attempt to build/play a

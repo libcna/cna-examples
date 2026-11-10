@@ -15,7 +15,7 @@ using namespace CnaExamples::GameStateManagement;
 using CNA::Input::Power;
 using CNA::Input::PowerStateEXT;
 
-// Demonstrates the NOXNA/EXT CNA::Input::Power API: XNA 4.0 has no power
+// Demonstrates the CNAEXT/EXT CNA::Input::Power API: XNA 4.0 has no power
 // API at all -- this is a pure CNA extension backed by SDL3, reporting
 // whether the host machine is on battery, how much charge remains, and
 // how many seconds of runtime are left (useful for pausing/dimming a game

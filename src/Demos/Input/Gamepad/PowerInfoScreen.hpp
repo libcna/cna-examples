@@ -16,7 +16,7 @@ using namespace CnaExamples::GameStateManagement;
 using CNA::Input::PowerStateEXT;
 using Microsoft::Xna::Framework::Input::GamePad;
 
-// Demonstrates the NOXNA/EXT GetPowerInfoEXT(): a controller's battery
+// Demonstrates the CNAEXT/EXT GetPowerInfoEXT(): a controller's battery
 // charge state, for wireless pads that report one (wired controllers and
 // ones without a battery normally report NoBattery/Unknown, not an error).
 class PowerInfoScreen : public DemoScreen {

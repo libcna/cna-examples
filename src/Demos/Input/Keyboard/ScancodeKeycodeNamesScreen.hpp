@@ -19,7 +19,7 @@ using Microsoft::Xna::Framework::Input::Keyboard;
 using Microsoft::Xna::Framework::Input::KeyboardState;
 using Microsoft::Xna::Framework::Input::Keys;
 
-// Demonstrates the four scancode/keycode NOXNA/EXT helpers on the most
+// Demonstrates the four scancode/keycode CNAEXT/EXT helpers on the most
 // recently pressed key: GetKeyNameEXT (layout-dependent "virtual key" name)
 // vs. GetScancodeNameEXT (physical, layout-independent position name), and
 // their inverses/round-trips (GetKeyFromNameEXT, GetScancodeFromNameEXT,

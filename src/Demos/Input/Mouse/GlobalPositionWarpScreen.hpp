@@ -16,7 +16,7 @@ using namespace CnaExamples::GameStateManagement;
 using Microsoft::Xna::Framework::Input::Mouse;
 using Microsoft::Xna::Framework::Input::MouseState;
 
-// Demonstrates the NOXNA/EXT desktop-coordinate pair: GetGlobalPositionEXT()
+// Demonstrates the CNAEXT/EXT desktop-coordinate pair: GetGlobalPositionEXT()
 // reads the cursor's position on the whole desktop (not just this window),
 // and WarpGlobalEXT() moves it there -- useful for multi-window apps or
 // tooling that SetPosition()'s window-relative coordinate can't express.

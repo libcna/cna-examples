@@ -20,7 +20,7 @@ using Microsoft::Xna::Framework::Vector3;
 using Microsoft::Xna::Framework::Graphics::Texture2D;
 using SharpRuntime::charcs;
 
-// Demonstrates SpriteFont's public NOXNA constructor -- in real XNA this
+// Demonstrates SpriteFont's public CNAEXT constructor -- in real XNA this
 // constructor is internal, only ever invoked by the content pipeline's
 // SpriteFontReader; CNA has no XNB pipeline, so it's exposed directly for
 // applications (or content readers) that build the glyph atlas themselves.

@@ -18,7 +18,7 @@ using Microsoft::Xna::Framework::Input::TextInputEXT;
 using SharpRuntime::charcs;
 using TextInputToken = System::MulticastAction<charcs>::Token;
 
-// Demonstrates the NOXNA/EXT TextInputEXT API: StartTextInput()/
+// Demonstrates the CNAEXT/EXT TextInputEXT API: StartTextInput()/
 // StopTextInput() and the TextInput event, which (unlike polling
 // Keyboard::GetState()) delivers already-composed, layout-and-IME-aware
 // characters -- the correct way to build a text box. Text input is only

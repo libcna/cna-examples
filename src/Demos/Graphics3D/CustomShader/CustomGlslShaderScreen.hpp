@@ -28,7 +28,7 @@ using Microsoft::Xna::Framework::Graphics::RasterizerState;
 using Microsoft::Xna::Framework::Graphics::ShaderEffect;
 using Microsoft::Xna::Framework::Graphics::Viewport;
 
-// Demonstrates ShaderEffect (NOXNA): a hand-authored GLSL vertex+fragment
+// Demonstrates ShaderEffect (CNAEXT): a hand-authored GLSL vertex+fragment
 // shader pair, compiled live at runtime from source strings (not a file
 // path), applied to a rotating VertexPositionColor cube. The vertex
 // attribute layout (location 0 = vec3 position, location 1 = vec4 color)

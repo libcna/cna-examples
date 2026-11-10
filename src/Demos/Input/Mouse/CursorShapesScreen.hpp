@@ -6,6 +6,7 @@
 #include <string>
 #include <vector>
 
+#include "CNA/Platform/PlatformException.hpp"
 #include "Microsoft/Xna/Framework/Input/Mouse.hpp"
 #include "Microsoft/Xna/Framework/Input/MouseCursor.hpp"
 
@@ -17,17 +18,20 @@ using namespace CnaExamples::GameStateManagement;
 using Microsoft::Xna::Framework::Input::Mouse;
 using Microsoft::Xna::Framework::Input::MouseCursor;
 
-// Demonstrates the NOXNA/EXT MouseCursor stock-shape gallery (a MonoGame-
+// Demonstrates the CNAEXT/EXT MouseCursor stock-shape gallery (a MonoGame-
 // derived extension, not part of XNA 4.0/FNA): Space/Enter/A/tap cycles
 // Mouse::SetCursor() through every stock cursor so the change is visible by
-// moving the mouse over the window.
+// moving the mouse over the window. A video driver without cursors (SDL's
+// offscreen driver, for one) refuses with CNA::Platform::PlatformException;
+// the screen reports that instead of failing.
 class CursorShapesScreen : public DemoScreen {
 public:
     CursorShapesScreen() : DemoScreen("Mouse: Cursor Shapes (EXT)") {}
 
     void OnDemoUnload() override {
         // Leave the system in a normal state for whatever screen is next.
-        Mouse::SetCursor(MouseCursor::getArrowProperty());
+        if (changed_) TrySetCursor(MouseCursor::getArrowProperty());
+        changed_ = false;
     }
 
 protected:
@@ -35,7 +39,7 @@ protected:
         PlayerIndex playerIndex;
         if (input.IsMenuSelect(ControllingPlayer(), playerIndex)) {
             index_ = (index_ + 1) % (int)kCursors.size();
-            Mouse::SetCursor(kCursors[index_].get());
+            if (TrySetCursor(kCursors[index_].get())) changed_ = true;
         }
     }
 
@@ -45,6 +49,11 @@ protected:
         lines.push_back("Move the mouse over this window to see it.");
         lines.emplace_back();
         lines.push_back(std::string("Current: ") + kCursors[index_].name);
+        if (!refusal_.empty()) {
+            lines.emplace_back();
+            lines.push_back("This platform refused the cursor:");
+            lines.push_back("  " + refusal_);
+        }
 
         DrawLines(sb, font, Vector2(40.0f, 90.0f), lines, mul(Color::White, TransitionAlpha()));
     }
@@ -70,7 +79,19 @@ private:
         {"WaitArrow", [] () -> MouseCursor& { return MouseCursor::getWaitArrowProperty(); }},
     };
 
+    bool TrySetCursor(MouseCursor& cursor) {
+        try {
+            Mouse::SetCursor(cursor);
+            return true;
+        } catch (const CNA::Platform::PlatformException& ex) {
+            refusal_ = ex.what();
+            return false;
+        }
+    }
+
     int index_ = 0;
+    bool changed_ = false;
+    std::string refusal_;
 };
 
 } // namespace CnaExamples::Demos::Input::MouseDemos

@@ -20,7 +20,7 @@ using CNA::Input::Joysticks;
 // Demonstrates JoystickStateEXT's free operator==/operator!= (a
 // whole-struct field comparison, unlike GamePadState's Equals()/
 // GetHashCode() member functions -- CNA's raw joystick types are plain
-// NOXNA structs with only comparison operators, no XNA-style Equals
+// CNAEXT structs with only comparison operators, no XNA-style Equals
 // surface, since they have no XNA precedent to match): freezes a snapshot
 // of the first joystick's state (Space/Enter/A/tap), then compares it
 // against the live state every frame.

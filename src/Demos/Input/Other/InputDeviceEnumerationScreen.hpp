@@ -14,7 +14,7 @@ using namespace CnaExamples::GameStateManagement;
 using CNA::Input::InputDeviceInfoEXT;
 using CNA::Input::InputDevices;
 
-// Demonstrates the NOXNA/EXT CNA::Input::InputDevices enumeration API: XNA
+// Demonstrates the CNAEXT/EXT CNA::Input::InputDevices enumeration API: XNA
 // 4.0 assumes exactly one keyboard, one mouse, and up to four gamepads,
 // with no device list -- this CNA extension enumerates every mouse,
 // keyboard, and touch device by id/name. Metadata only: XNA input state

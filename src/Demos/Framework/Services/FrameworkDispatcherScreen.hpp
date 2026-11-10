@@ -26,7 +26,7 @@ using Microsoft::Xna::Framework::FrameworkDispatcher;
 // never fire.
 //
 // This screen makes the mechanism visible: the pending-event flags the
-// dispatcher consumes are readable (they are NOXNA extensions in CNA), and
+// dispatcher consumes are readable (they are CNAEXT extensions in CNA), and
 // calling Update() by hand here is a real, harmless extra pump.
 class FrameworkDispatcherScreen : public DemoScreen {
 public:
@@ -58,7 +58,7 @@ protected:
         lines.push_back("Frames on this screen: " + std::to_string(frames_));
         lines.push_back("Manual pumps:          " + std::to_string(manualPumps_));
         lines.emplace_back();
-        lines.push_back("Pending flags the dispatcher drains (NOXNA, readable in CNA):");
+        lines.push_back("Pending flags the dispatcher drains (CNAEXT, readable in CNA):");
         lines.push_back("  ActiveSongChanged pending now: " +
                         std::string(FrameworkDispatcher::ActiveSongChanged ? "true" : "false"));
         lines.push_back("  MediaStateChanged pending now: " +

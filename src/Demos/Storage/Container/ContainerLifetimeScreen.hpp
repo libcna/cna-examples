@@ -6,6 +6,7 @@
 #include <vector>
 
 #include "SharpRuntime/SharpRuntimeHelper.hpp"
+#include "System/ObjectDisposedException.hpp"
 
 #include "Demos/DemoScreen.hpp"
 #include "Demos/Storage/StorageDemoHelpers.hpp"
@@ -16,18 +17,16 @@ using namespace CnaExamples::GameStateManagement;
 using CnaExamples::Demos::DemoScreen;
 
 // Dispose(), Disposing, reopening a container, and StorageDevice::DeleteContainer
-// -- four things whose names suggest they lock a container down, and mostly
-// do not.
+// -- four things whose exact effect is easy to guess wrong.
 //
 // What is real, verified live below:
 //   * Disposing fires exactly once no matter how many times Dispose() is
 //     called -- CNA guards it with an isDisposed_ check, so it is genuinely
 //     idempotent, not merely documented as such.
-//   * Dispose() does NOT gate anything else. There is no isDisposed_ check
-//     anywhere in CreateFile/OpenFile/FileExists/etc, so a "disposed"
-//     container's file operations keep working exactly as before. Dispose()
-//     here means "the Disposing event has fired", not "this object is now
-//     unusable" -- do not assume the second from the first.
+//   * Dispose() DOES gate the handle, as in XNA: file and directory
+//     operations on a disposed container throw ObjectDisposedException.
+//     IsDisposed and a repeated Dispose() stay available, and the files it
+//     already wrote stay on disk.
 //   * "Reopening" a container is not tracked at all: StorageDevice hands out
 //     a brand new StorageContainer instance every time, with no notion of
 //     "already open". Two independent handles over the same directory are
@@ -62,8 +61,9 @@ protected:
                         YesNo(disposedAfter_) + "  (2 calls, Disposing fired " +
                         std::to_string(disposeCount_) + "x -- idempotent)");
         lines.emplace_back();
-        lines.push_back("FileExists() on that SAME disposed handle still works: " +
-                        YesNo(fileExistsAfterDispose_) + " -- Dispose() does not gate use.");
+        lines.push_back("FileExists() on that SAME disposed handle: " +
+                        std::string(disposedUseRefused_ ? "throws ObjectDisposedException."
+                                                        : "did NOT throw."));
         lines.emplace_back();
         lines.push_back("Reopen (2nd handle, old one still alive) sees the marker it wrote: " +
                         YesNo(reopenedSeesMarker_));
@@ -123,10 +123,14 @@ private:
             Note(disposeCount_ == 1, "a second Dispose() call must not re-raise Disposing");
 
             // Deliberately still using `first` after Dispose() -- the point of
-            // this check is that nothing stops it.
-            fileExistsAfterDispose_ = first->FileExists(kMarker);
-            Note(fileExistsAfterDispose_,
-                "FileExists on a disposed handle should still work -- Dispose() doesn't gate it");
+            // this check is that it is refused.
+            try {
+                (void)first->FileExists(kMarker);
+            } catch (const System::ObjectDisposedException&) {
+                disposedUseRefused_ = true;
+            }
+            Note(disposedUseRefused_,
+                "FileExists on a disposed handle should throw ObjectDisposedException");
 
             // "Reopen" while `first` is still alive: a second, independent handle.
             reopened_ = OpenContainer(*device_, kLifetimeContainerName);
@@ -167,7 +171,7 @@ private:
     bool opened_ = false;
     bool disposedBefore_ = false;
     bool disposedAfter_ = false;
-    bool fileExistsAfterDispose_ = false;
+    bool disposedUseRefused_ = false;
     bool reopenedSeesMarker_ = false;
     bool marketSeenAfterDelete_ = false;
 };

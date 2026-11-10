@@ -27,7 +27,7 @@ std::vector<DemoEntry> BuildSongDemos() {
     using namespace CnaExamples::Demos::Media::SongDemos;
     std::vector<DemoEntry> demos;
     demos.push_back(MakeDemo<LoadAndPlayScreen>(
-        "Load & Play", "Song's direct-from-file NOXNA constructor + transport controls",
+        "Load & Play", "Song's direct-from-file CNAEXT constructor + transport controls",
         {"Song", "MediaPlayer::Play", "MediaPlayer::PlayPosition"}));
     demos.push_back(MakeDemo<VolumeMuteRepeatShuffleScreen>(
         "Volume/Mute/Repeat/Shuffle", "MediaPlayer's live-adjustable playback settings",

@@ -73,12 +73,14 @@ Until `PrerequisitesMet()` succeeds, the screen remains unloaded and renders its
 ## Renderer capability gating
 
 CNA selects its graphics renderer at configure time through `CNA_GRAPHICS_RENDERER`; this project
-defaults to `OPENGLES3`. The application must not assume that every renderer implements a full 3D
-pipeline. `SDL_RENDERER`, for example, is deliberately 2D-only.
+keeps CNA's per-platform default (`OPENGLES3` on Linux). The application must not assume that
+every renderer implements a full 3D pipeline. `STUB`, for example, reports no capability at all.
 
 `Requiring()` in `AreaCatalogInternal.hpp` attaches a `GraphicsCapability` requirement at the
-catalog assembly site, normally to an entire category. `DemoScreen` checks that requirement before
-load, update, input, and draw. Gating the draw path alone is insufficient because most 3D screens
+catalog assembly site, normally to an entire category. Requirements accumulate, so one demo in a
+gated category can add its own: the FillMode demo also needs `WireFrame`, which an OpenGL ES
+context without polygon mode lacks. `DemoScreen` checks every requirement before load, update,
+input, and draw. Gating the draw path alone is insufficient because most 3D screens
 create GPU resources during loading. On an unsupported renderer the demo displays an explanatory
 panel instead of executing any guarded hook.
 

@@ -2,11 +2,11 @@
 #pragma once
 
 #include <optional>
-#include <stdexcept>
 #include <string>
 #include <vector>
 
 #include "Microsoft/Xna/Framework/Graphics/Texture2D.hpp"
+#include "System/InvalidOperationException.hpp"
 
 #include "Demos/DemoScreen.hpp"
 #include "Demos/Graphics2D/TextureDemoHelpers.hpp"
@@ -16,8 +16,8 @@ namespace CnaExamples::Demos::Graphics2D::BeginEndStateDemos {
 using namespace CnaExamples::GameStateManagement;
 using Microsoft::Xna::Framework::Graphics::Texture2D;
 
-// Demonstrates that Draw() (and DrawString()) throw std::runtime_error if
-// called while no Begin()/End() session is open.
+// Demonstrates that Draw() (and DrawString()) throw InvalidOperationException,
+// as in XNA, if called while no Begin()/End() session is open.
 class DrawOutsideBeginThrowsScreen : public DemoScreen {
 public:
     DrawOutsideBeginThrowsScreen() : DemoScreen("SpriteBatch: Draw Outside Begin() Throws") {}
@@ -47,8 +47,8 @@ protected:
             try {
                 sb.Draw(*dummy_, Vector2(0.0f, 0.0f), Color::White);
                 lastResult_ = "Draw() returned without throwing (unexpected)";
-            } catch (const std::runtime_error& ex) {
-                lastResult_ = std::string("Draw() threw: ") + ex.what();
+            } catch (const System::InvalidOperationException& ex) {
+                lastResult_ = "Draw() threw InvalidOperationException: " + ex.getMessageProperty();
             }
             sb.Begin(); // restore an open batch for the rest of this frame
         }

@@ -24,7 +24,7 @@ using Microsoft::Xna::Framework::LaunchParameters;
 //     cna_examples --demo "Framework/Services/LaunchParameters"
 //
 // and both of those show up in the table below, parsed into a key and a value.
-// The screen also parses a fixed synthetic argument list through the NOXNA
+// The screen also parses a fixed synthetic argument list through the CNAEXT
 // explicit constructor, so the parsing rules (leading dashes stripped, "=" or a
 // following token as the value, bare flags getting an empty value) are visible
 // even when the app was started with no arguments at all.
@@ -53,7 +53,7 @@ protected:
         lines.push_back("ContainsKey(\"demo\"): " +
                         std::string(live.ContainsKey("demo") ? "true" : "false"));
         lines.emplace_back();
-        lines.push_back("Parsed from a fixed synthetic argv (NOXNA explicit constructor),");
+        lines.push_back("Parsed from a fixed synthetic argv (CNAEXT explicit constructor),");
         lines.push_back("so the rules are visible even with no real arguments:");
         for (const auto& [key, value] : Synthetic()) {
             lines.push_back("  \"" + key + "\" = \"" + value + "\"");

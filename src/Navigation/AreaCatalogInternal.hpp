@@ -45,7 +45,7 @@ inline std::vector<DemoEntry> Requiring(CNA::GraphicsCapability capability,
         demo.create = [inner, capability] {
             auto screen = inner();
             if (auto* demoScreen = dynamic_cast<Demos::DemoScreen*>(screen.get())) {
-                demoScreen->SetRequiredCapability(capability);
+                demoScreen->AddRequiredCapability(capability);
             }
             return screen;
         };

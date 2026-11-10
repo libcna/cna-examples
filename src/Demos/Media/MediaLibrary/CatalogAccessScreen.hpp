@@ -68,7 +68,7 @@ protected:
                         std::string(useDemoRoots_ ? "real OS folders" : "bundled demo library"));
         lines.emplace_back();
         lines.push_back(std::string("Indexing: ") +
-                        (useDemoRoots_ ? "bundled demo library (NOXNA root override)"
+                        (useDemoRoots_ ? "bundled demo library (CNAEXT root override)"
                                        : "the real OS Music/Pictures folders"));
         lines.push_back("  Music:    " + CompactPath(musicRoot_));
         lines.push_back("  Pictures: " + CompactPath(pictureRoot_));

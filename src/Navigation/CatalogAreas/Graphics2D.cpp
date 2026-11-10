@@ -48,7 +48,7 @@ std::vector<DemoEntry> BuildDrawingBasicsDemos() {
     using namespace CnaExamples::Demos::Graphics2D::DrawingBasicsDemos;
     std::vector<DemoEntry> demos;
     demos.push_back(MakeDemo<PositionDrawScreen>(
-        "Position Draw", "Draw(texture, Vector2 position, Color) + the NOXNA float x,y overload"));
+        "Position Draw", "Draw(texture, Vector2 position, Color) + the CNAEXT float x,y overload"));
     demos.push_back(MakeDemo<DestinationRectangleScreen>(
         "Destination Rectangle", "Stretching a texture to fill a Rectangle, 3 sizes side by side"));
     demos.push_back(MakeDemo<SourceRectangleScreen>(
@@ -108,7 +108,7 @@ std::vector<DemoEntry> BuildTexture2DBasicsDemos() {
     using namespace CnaExamples::Demos::Graphics2D::Texture2DBasicsDemos;
     std::vector<DemoEntry> demos;
     demos.push_back(MakeDemo<ProceduralCreationScreen>(
-        "Procedural Creation", "CreateFromPixels (NOXNA) vs. Texture2D(w,h)+SetData (XNA-idiomatic)"));
+        "Procedural Creation", "CreateFromPixels (CNAEXT) vs. Texture2D(w,h)+SetData (XNA-idiomatic)"));
     demos.push_back(MakeDemo<SetDataGetDataRoundTripScreen>(
         "SetData/GetData Round-Trip", "Write a known pattern, read it back, verify byte-for-byte"));
     demos.push_back(MakeDemo<PropertiesAndDisposeScreen>(
@@ -144,7 +144,7 @@ std::vector<DemoEntry> BuildSpriteFontDemos() {
     demos.push_back(MakeDemo<LineSpacingAndSpacingScreen>(
         "LineSpacing & Spacing", "Live-adjustable, on the app's own shared menu font"));
     demos.push_back(MakeDemo<HandBuiltFontScreen>(
-        "Hand-Built From Scratch", "A brand-new SpriteFont via its public NOXNA constructor"));
+        "Hand-Built From Scratch", "A brand-new SpriteFont via its public CNAEXT constructor"));
     return demos;
 }
 

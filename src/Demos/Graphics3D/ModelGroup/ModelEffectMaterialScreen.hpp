@@ -44,21 +44,13 @@ using Microsoft::Xna::Framework::Graphics::Viewport;
 
 // D3: two related findings about ModelMeshPart's own Effect slot.
 //
-// First -- EffectMaterial. Its own doc comment says it is "created internally
-// by the content pipeline; games do not instantiate it directly." Neither of
-// CNA's two Model content readers agrees: the .cnj ModelTypeReader (read
-// directly, ContentManager.cpp) always constructs a real stock effect
-// (BasicEffect/SkinnedEffect/DualTextureEffect/PbrEffect/SkinnedPbrEffect)
-// straight into the part's Effect slot, never an EffectMaterial; the XNB
-// ModelContentTypeReaders.cpp path does the same. The only place EffectMaterial
-// is actually constructed anywhere in this codebase is its own unit test. It
-// IS fully constructible and clonable standalone (proven below, the same way
-// the unit test does) -- but reading EffectMaterial.cpp directly shows its
-// OnApply() override is an empty function body. Applying one, even
-// successfully constructed, would bind no parameters and change no GPU state;
-// this is stated from source, not attempted live, since drawing with a
-// deliberately no-op shader application is not something to try against a
-// real GL context.
+// First -- EffectMaterial. As in XNA, it comes from the content pipeline: an
+// .xnb model whose material names a compiled effect is read into an
+// EffectMaterial, while stock materials become BasicEffect, SkinnedEffect and
+// so on directly. It is also constructible by hand from any Effect, which is
+// what this screen does. Its Clone() is XNA's Effect.Clone, `new Effect(this)`:
+// the copy is a plain, independent Effect with the same techniques and values,
+// not another EffectMaterial.
 //
 // Second -- swapping a mesh part's Effect at runtime, live. ModelMeshPart::setEffectProperty()
 // (see Model: Load & Traverse's own finding) self-maintains its parent mesh's own Effects
@@ -77,9 +69,9 @@ public:
         material_.emplace(*materialSource_);
         materialTypeNameOk_ = material_->GetTypeName() == "Microsoft.Xna.Framework.Graphics.EffectMaterial";
         materialClone_.reset(material_->Clone());
-        auto* clonedMaterial = dynamic_cast<EffectMaterial*>(materialClone_.get());
-        materialCloneOk_ = clonedMaterial != nullptr &&
-                           static_cast<Effect*>(clonedMaterial) != static_cast<Effect*>(&*material_);
+        materialCloneOk_ = materialClone_ != nullptr &&
+                           materialClone_.get() != static_cast<Effect*>(&*material_) &&
+                           materialClone_->GetTypeName() == "Microsoft.Xna.Framework.Graphics.Effect";
 
         // Part 2: a real Model, loaded through content, whose one mesh part's
         // Effect gets swapped live between two different real BasicEffects.
@@ -139,11 +131,11 @@ protected:
 
     void OnDemoDraw(const GameTime&, SpriteBatch& sb, SpriteFont& font) override {
         std::vector<std::string> lines;
-        lines.push_back("EffectMaterial's doc comment: \"created internally by the content pipeline.\" Neither");
-        lines.push_back("Model reader agrees -- both always build a real stock effect directly. It IS");
-        lines.push_back("constructible/clonable by hand (below), but OnApply() is an empty function body.");
+        lines.push_back("EffectMaterial comes from the content pipeline: an .xnb model whose");
+        lines.push_back("material names a compiled effect. It can also be built by hand from");
+        lines.push_back("any Effect (below); Clone() returns a plain Effect, as XNA's does.");
         lines.push_back("  GetTypeName correct: " + std::string(materialTypeNameOk_ ? "yes" : "NO") +
-                        "   Clone() independent: " + std::string(materialCloneOk_ ? "yes" : "NO"));
+                        "   Clone() is a separate Effect: " + std::string(materialCloneOk_ ? "yes" : "NO"));
         lines.emplace_back();
         if (!error_.empty()) {
             lines.push_back("Model load FAILED: " + error_);

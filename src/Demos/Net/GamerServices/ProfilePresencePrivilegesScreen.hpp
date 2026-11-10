@@ -21,9 +21,10 @@ using Microsoft::Xna::Framework::GamerServices::GamerPresenceMode;
 using Microsoft::Xna::Framework::GamerServices::GamerProfile;
 using Microsoft::Xna::Framework::GamerServices::SignedInGamer;
 
-// Demonstrates SignedInGamer::GetProfile()/Presence/Privileges on the first stub signed-in
-// gamer -- all populated with plausible-but-synthetic defaults (there is no real profile
-// backend), but the getter/setter surface itself is real and functional.
+// Demonstrates SignedInGamer::GetProfile()/Presence/Privileges on the first signed-in gamer.
+// Without an account service the profile comes from the local profile store (its
+// TotalAchievements counts what that profile has earned there), and a local profile holds no
+// online privileges.
 class ProfilePresencePrivilegesScreen : public SignedInGamerDemoScreen {
 public:
     ProfilePresencePrivilegesScreen() : SignedInGamerDemoScreen("GamerServices: Profile/Presence/Privileges") {}

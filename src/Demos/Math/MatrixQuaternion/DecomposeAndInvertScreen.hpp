@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 #pragma once
 
+#include <cmath>
 #include <string>
 #include <vector>
 
@@ -25,17 +26,21 @@ using Microsoft::Xna::Framework::Vector3;
 // Decompose pulls a world matrix back apart into scale, rotation and
 // translation, and returns a bool saying whether it could.
 //
-// What that bool actually detects is narrower than people expect, and this
-// screen shows the real rule rather than the assumed one. CNA (following FNA)
-// derives each scale axis from the length of a basis row and returns false only
-// when one of them is ~zero -- i.e. the matrix collapses a dimension. That is
-// the "Singular" case below.
+// What that bool actually detects is not what people expect, and this screen
+// shows the real rule rather than the assumed one. CNA follows XNA 4.0: each
+// scale is the length of a basis row, the rows are normalised, and Decompose
+// returns false (with an Identity rotation) only when those unit rows are not
+// orthonormal enough -- their determinant is not within 0.01 of +/-1.
 //
-// A SHEARED matrix returns TRUE. Decompose cannot represent shear in
-// scale/rotation/translation, so what comes back is a best-fit that does not
-// reconstruct the original -- a silently wrong answer rather than a reported
-// failure. The screen multiplies the parts back together and shows the
-// mismatch, because that is the only way to notice.
+// So a strong SHEAR is refused, but a slight one passes the tolerance and
+// returns TRUE. Decompose cannot represent shear in scale/rotation/translation,
+// so what comes back is a best fit that does not reconstruct the original -- a
+// silently wrong answer rather than a reported failure. The screen multiplies
+// the parts back together and shows the mismatch, because that is the only way
+// to notice.
+//
+// A ZERO scale axis is not refused either: Decompose returns TRUE with the
+// exact scale and a NaN rotation.
 //
 // Invert and Determinant are shown together for the same reason: a matrix with
 // a zero determinant is singular and has no inverse, and that is the case worth
@@ -71,7 +76,7 @@ protected:
         lines.push_back(std::string("Case: ") + kCaseNames[caseIndex_]);
         lines.emplace_back();
         lines.push_back("Decompose() returned: " +
-                        std::string(decomposed ? "true" : "FALSE -- a scale axis is ~zero"));
+                        std::string(decomposed ? "true" : "FALSE -- the basis is not a rotation"));
         if (decomposed) {
             lines.push_back("  scale       " + V3(scale));
             lines.push_back("  translation " + V3(translation));
@@ -83,13 +88,16 @@ protected:
             const Matrix rebuilt = Matrix::CreateScale(scale) *
                                    Matrix::CreateFromQuaternion(rotation) *
                                    Matrix::CreateTranslation(translation);
+            const bool nanRotation = std::isnan(rotation.X) || std::isnan(rotation.Y) ||
+                                     std::isnan(rotation.Z) || std::isnan(rotation.W);
             lines.push_back("  rebuilt from the parts == original: " +
-                            std::string(Approximately(rebuilt, source)
+                            std::string(nanRotation ? "NO -- the rotation is NaN"
+                                        : Approximately(rebuilt, source)
                                             ? "yes -- a true decomposition"
                                             : "NO -- 'true' was a best fit, not a decomposition"));
         } else {
-            lines.push_back("  One basis row has ~zero length, so there is no scale to divide by.");
-            lines.push_back("  rotation is set to Identity and the bool is the real answer.");
+            lines.push_back("  |determinant| of the normalised rows is not within 0.01 of 1,");
+            lines.push_back("  so rotation is set to Identity and the bool is the real answer.");
         }
         lines.emplace_back();
         lines.push_back("Determinant: " + F(determinant, 4) +
@@ -107,20 +115,21 @@ protected:
         lines.push_back("  Transpose == Invert: " +
                         std::string(Approximately(Matrix::Transpose(source), inverse) ? "yes" : "no"));
         lines.emplace_back();
-        lines.push_back("The shear case is the one worth sitting with: Decompose reports success");
-        lines.push_back("and hands back parts that do not rebuild the matrix. Only checking the");
-        lines.push_back("round trip catches it -- the return value alone will not.");
+        lines.push_back("Two cases deserve attention: a slight shear reports success with parts");
+        lines.push_back("that do not rebuild the matrix, and a zero scale axis reports success");
+        lines.push_back("with a NaN rotation. Only checking the round trip catches either.");
 
         DrawLines(sb, font, Vector2(40.0f, 82.0f), lines, mul(Color::White, TransitionAlpha()));
     }
 
 private:
-    static constexpr int kCaseCount = 4;
+    static constexpr int kCaseCount = 5;
     static constexpr const char* kCaseNames[kCaseCount] = {
         "Scale(2,3,1) * RotationZ(30) * Translation(5,1,0)",
         "Pure rotation: RotationY(45)",
-        "Singular: Scale(1, 0, 1)   -- a zero scale axis",
-        "Sheared (M21 = 0.7)        -- decomposes, but WRONGLY",
+        "Singular: Scale(1, 0, 1)    -- succeeds, rotation NaN",
+        "Sheared (M21 = 0.7)         -- refused",
+        "Slightly sheared (M21 = 0.05) -- succeeds, but WRONGLY",
     };
 
     static Matrix BuildCase(int index) {
@@ -133,9 +142,14 @@ private:
                 return Matrix::CreateRotationY(MathHelper::ToRadians(45.0f));
             case 2:
                 return Matrix::CreateScale(1.0f, 0.0f, 1.0f);
-            default: {
+            case 3: {
                 Matrix sheared = Matrix::getIdentityProperty();
                 sheared.M21 = 0.7f;
+                return sheared;
+            }
+            default: {
+                Matrix sheared = Matrix::getIdentityProperty();
+                sheared.M21 = 0.05f;
                 return sheared;
             }
         }

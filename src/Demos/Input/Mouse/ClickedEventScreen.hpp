@@ -16,7 +16,7 @@ using namespace CnaExamples::GameStateManagement;
 using Microsoft::Xna::Framework::Input::Mouse;
 using ClickedToken = System::MulticastAction<int>::Token;
 
-// Demonstrates the NOXNA/EXT Mouse::ClickedEXT event -- an event-driven
+// Demonstrates the CNAEXT/EXT Mouse::ClickedEXT event -- an event-driven
 // alternative to polling MouseState's button properties, firing once per
 // physical click (button index: 0=Left, 1=Middle, 2=Right, 3=XButton1,
 // 4=XButton2, matching FNA's INTERNAL_onClicked convention). Subscribes in

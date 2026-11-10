@@ -17,7 +17,7 @@ using CNA::Input::JoystickCapabilitiesEXT;
 using CNA::Input::JoystickInfoEXT;
 using CNA::Input::Joysticks;
 
-// Demonstrates the NOXNA/EXT CNA::Input::Joysticks raw-joystick API: XNA 4.0
+// Demonstrates the CNAEXT/EXT CNA::Input::Joysticks raw-joystick API: XNA 4.0
 // only ever modeled Xbox-style mapped gamepads (Microsoft::Xna::Framework::
 // Input::GamePad); this is SDL3's unmapped view of the same and other
 // hardware (flight sticks, wheels, throttles, arbitrary HID devices) --

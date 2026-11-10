@@ -7,7 +7,7 @@
 #include "Microsoft/Xna/Framework/Net/LocalNetworkGamer.hpp"
 #include "Microsoft/Xna/Framework/Net/NetworkMachine.hpp"
 #include "Microsoft/Xna/Framework/Net/NetworkSession.hpp"
-#include "System/NotImplementedException.hpp"
+#include "System/InvalidOperationException.hpp"
 
 #include "Demos/Net/NetDemoHelpers.hpp"
 #include "Demos/Net/SignedInGamerDemoScreen.hpp"
@@ -19,8 +19,9 @@ using Microsoft::Xna::Framework::Net::LocalNetworkGamer;
 using Microsoft::Xna::Framework::Net::NetworkMachine;
 
 // Demonstrates NetworkGamer::Machine (the NetworkMachine grouping gamers that share a
-// physical host) and NetworkMachine::RemoveFromSession() -- which always throws
-// NotImplementedException, matching FNA's own stub, not a CNA gap.
+// physical host) and NetworkMachine::RemoveFromSession(). As in XNA, only the host may
+// remove another machine; called on the local machine, as here, it throws
+// InvalidOperationException.
 class NetworkMachineScreen : public SignedInGamerDemoScreen {
 public:
     NetworkMachineScreen() : SignedInGamerDemoScreen("NetworkGamer: NetworkMachine") {}
@@ -47,8 +48,8 @@ protected:
                 NetworkMachine machine = localGamer_->getMachineProperty();
                 machine.RemoveFromSession();
                 lastResult_ = "RemoveFromSession() returned without throwing (unexpected)";
-            } catch (const System::NotImplementedException& ex) {
-                lastResult_ = std::string("RemoveFromSession() threw NotImplementedException: ") + ex.getMessageProperty();
+            } catch (const System::InvalidOperationException& ex) {
+                lastResult_ = std::string("RemoveFromSession() threw InvalidOperationException: ") + ex.getMessageProperty();
             }
         }
     }

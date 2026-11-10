@@ -20,7 +20,7 @@ using Microsoft::Xna::Framework::Input::Touch::TouchPanel;
 // Demonstrates TouchLocation::Equals()/GetHashCode()/ToString() by diffing
 // the first active touch (index 0 of TouchPanel::GetState()) against what
 // it was last frame -- an invalid (default-constructed) TouchLocation
-// before any touch has occurred, matching the "no touch" NOXNA constructor.
+// before any touch has occurred, matching the "no touch" CNAEXT constructor.
 class TouchLocationQueryScreen : public DemoScreen {
 public:
     TouchLocationQueryScreen() : DemoScreen("Touch: TouchLocation Equals()/ToString()") {}

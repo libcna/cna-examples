@@ -17,7 +17,7 @@ using namespace CnaExamples::GameStateManagement;
 using CNA::Input::InputDevices;
 using DeviceHotplugToken = System::MulticastAction<std::uint32_t>::Token;
 
-// Demonstrates the NOXNA/EXT mouse/keyboard hot-plug events on
+// Demonstrates the CNAEXT/EXT mouse/keyboard hot-plug events on
 // CNA::Input::InputDevices: plug in or unplug a mouse or keyboard while
 // this screen is open to see it logged live. Four separate events (Mouse
 // Connected/Disconnected, Keyboard Connected/Disconnected), all

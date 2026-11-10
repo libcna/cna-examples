@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 #pragma once
 
+#include <cstdint>
 #include <optional>
 #include <string>
 #include <vector>
@@ -10,6 +11,10 @@
 #include "Microsoft/Xna/Framework/Graphics/PrimitiveType.hpp"
 #include "Microsoft/Xna/Framework/Graphics/RasterizerState.hpp"
 #include "Microsoft/Xna/Framework/Graphics/Texture2D.hpp"
+#include "Microsoft/Xna/Framework/Graphics/VertexDeclaration.hpp"
+#include "Microsoft/Xna/Framework/Graphics/VertexElement.hpp"
+#include "Microsoft/Xna/Framework/Graphics/VertexElementFormat.hpp"
+#include "Microsoft/Xna/Framework/Graphics/VertexElementUsage.hpp"
 #include "Microsoft/Xna/Framework/Graphics/Viewport.hpp"
 #include "Microsoft/Xna/Framework/MathHelper.hpp"
 #include "Microsoft/Xna/Framework/Matrix.hpp"
@@ -28,21 +33,41 @@ using Microsoft::Xna::Framework::Graphics::DualTextureEffect;
 using Microsoft::Xna::Framework::Graphics::PrimitiveType;
 using Microsoft::Xna::Framework::Graphics::RasterizerState;
 using Microsoft::Xna::Framework::Graphics::Texture2D;
+using Microsoft::Xna::Framework::Graphics::VertexDeclaration;
+using Microsoft::Xna::Framework::Graphics::VertexElement;
+using Microsoft::Xna::Framework::Graphics::VertexElementFormat;
+using Microsoft::Xna::Framework::Graphics::VertexElementUsage;
 using Microsoft::Xna::Framework::Graphics::Viewport;
 
 // Demonstrates DualTextureEffect's 2 simultaneous texture layers (Texture +
 // Texture2, both real GPU samplers blended per-pixel by the actual
-// backend shader -- not composited on the CPU first): a checkerboard base
+// renderer shader -- not composited on the CPU first): a checkerboard base
 // layer combined with a gradient second layer on the same cube, so the
 // result is genuinely darker/lighter across the gradient's direction while
 // still showing the checkerboard pattern underneath.
+//
+// Each layer has its own texture coordinates, as in XNA: the shader reads
+// TextureCoordinate0 for Texture and TextureCoordinate1 for Texture2, and a
+// vertex declaration without TextureCoordinate1 is refused at draw time with
+// InvalidOperationException. None of the stock vertex types carries two UV
+// sets, so this screen declares its own vertex. Its second set is the first
+// one transposed, which turns the gradient a quarter turn against the
+// checkerboard and shows the two layers really are addressed independently.
 class DualTextureBlendScreen : public DemoScreen {
 public:
     DualTextureBlendScreen() : DemoScreen("DualTextureEffect: 2-Layer Blend") {}
 
     void OnDemoLoad() override {
         auto& device = GetScreenManager()->getGraphicsDeviceProperty();
-        mesh_ = BuildCubeTextureMesh(1.0f);
+        const CubeTextureMesh cube = BuildCubeTextureMesh(1.0f);
+        vertices_.clear();
+        vertices_.reserve(cube.vertices.size());
+        for (const auto& v : cube.vertices) {
+            const Vector2 uv = v.TextureCoordinate;
+            vertices_.push_back(DualTextureVertex{v.Position.X, v.Position.Y, v.Position.Z,
+                                                  uv.X, uv.Y, uv.Y, uv.X});
+        }
+        indices_ = cube.indices;
         baseTexture_.emplace(CnaExamples::Demos::Graphics2D::CreateCheckerboardTexture(
             device, 64, 64, 8, Color(255, 255, 255, 255), Color(80, 80, 80, 255)));
         secondTexture_.emplace(CnaExamples::Demos::Graphics2D::CreateGradientTexture(
@@ -67,13 +92,15 @@ protected:
         std::vector<std::string> lines;
         lines.push_back("DualTextureEffect.Texture (checkerboard) + .Texture2 (red-to-blue");
         lines.push_back("gradient) -- both real GPU samplers, blended per-pixel by the shader.");
-        DrawLines(sb, font, Vector2(40.0f, 90.0f), lines, mul(Color::White, TransitionAlpha()));
+        lines.push_back("Each layer reads its own UV set: TextureCoordinate0 and 1.");
+        const Vector2 end =
+            DrawLines(sb, font, Vector2(40.0f, 90.0f), lines, mul(Color::White, TransitionAlpha()));
 
         sb.End();
 
         auto& device = GetScreenManager()->getGraphicsDeviceProperty();
         const Viewport original = device.getViewportProperty();
-        Viewport scene(0, 170, original.getWidthProperty(), 400);
+        Viewport scene(0, (int)end.Y + 10, original.getWidthProperty(), 380);
         device.setViewportProperty(scene);
         device.setDepthStencilStateProperty(DepthStencilState::Default);
         device.setRasterizerStateProperty(RasterizerState::CullNone);
@@ -84,9 +111,9 @@ protected:
             MathHelper::PiOver4, (float)scene.getWidthProperty() / (float)scene.getHeightProperty(), 0.1f, 100.0f));
 
         effect_->Apply();
-        device.DrawUserIndexedPrimitives(PrimitiveType::TriangleList, mesh_.vertices.data(), 0,
-                                         (int)mesh_.vertices.size(), mesh_.indices.data(), 0,
-                                         (int)mesh_.indices.size() / 3);
+        device.DrawUserIndexedPrimitives(PrimitiveType::TriangleList, vertices_.data(), 0,
+                                         (int)vertices_.size(), indices_.data(), 0,
+                                         (int)indices_.size() / 3, Declaration());
 
         device.setViewportProperty(original);
         device.setRasterizerStateProperty(RasterizerState::CullCounterClockwise);
@@ -95,7 +122,27 @@ protected:
     }
 
 private:
-    CubeTextureMesh mesh_;
+    // Plain floats, so the array is exactly the GPU stream the declaration
+    // describes: position, then UV set 0, then UV set 1.
+    struct DualTextureVertex {
+        float x, y, z;
+        float u0, v0;
+        float u1, v1;
+    };
+
+    static const VertexDeclaration& Declaration() {
+        static const VertexDeclaration declaration(
+            (int)sizeof(DualTextureVertex),
+            {
+                VertexElement(0, VertexElementFormat::Vector3, VertexElementUsage::Position, 0),
+                VertexElement(12, VertexElementFormat::Vector2, VertexElementUsage::TextureCoordinate, 0),
+                VertexElement(20, VertexElementFormat::Vector2, VertexElementUsage::TextureCoordinate, 1),
+            });
+        return declaration;
+    }
+
+    std::vector<DualTextureVertex> vertices_;
+    std::vector<std::uint16_t> indices_;
     std::optional<Texture2D> baseTexture_;
     std::optional<Texture2D> secondTexture_;
     std::optional<DualTextureEffect> effect_;

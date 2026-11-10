@@ -17,22 +17,20 @@ namespace CnaExamples::Demos::Graphics3D::EffectReflectionDemos {
 using namespace CnaExamples::GameStateManagement;
 using Microsoft::Xna::Framework::Graphics::BasicEffect;
 
-// XNA's Effect reflection API -- Parameters, Techniques, Passes, Annotations --
-// exists in CNA in full, and CNA's own built-in effects populate almost none of
-// it. That is the single most useful thing this screen can say, because it is
-// exactly what breaks when XNA code is ported:
+// XNA's Effect reflection API -- Parameters, Techniques, Passes, Annotations
+// -- and what CNA's stock effects put in it. As in XNA, BasicEffect exposes
+// the parameters of its compiled shader: WorldViewProj, DiffuseColor,
+// DirLight0Direction and the rest, 21 in all, under one technique called
+// "BasicEffect". XNA code that reflects over a stock effect therefore ports
+// unchanged.
 //
-//     effect.Parameters["WorldViewProj"]->SetValue(matrix);   // nullptr deref
+// What still needs care is a name the effect does not declare: the lookup
+// returns a null pointer rather than throwing, so
 //
-// In XNA, BasicEffect's parameters come out of a compiled .fxb, so that lookup
-// finds something. CNA's BasicEffect is hand-written C++ whose state lives in
-// typed fields and property setters -- World, DiffuseColor, VertexColorEnabled
-// -- and it never adds a single EffectParameter. The collection is empty, and
-// the name lookup returns a null pointer rather than throwing.
+//     effect.Parameters["NoSuchName"]->SetValue(matrix);   // nullptr deref
 //
-// The collections are not decorative: Effect's own constructor adds one
-// technique called "Default", and anything that builds an effect can Add()
-// parameters of its own. See the EffectParameter screen for that side of it.
+// must be checked first. See the EffectParameter screen for the parameter
+// classes and types themselves.
 //
 // Everything below is measured from the live objects, not asserted from memory.
 class ReflectionSurfaceScreen : public DemoScreen {
@@ -52,11 +50,13 @@ public:
             annotationCount_ = current->getAnnotationsProperty().getCountProperty();
         }
 
-        // The porting trap itself, exercised rather than described: a by-name
-        // lookup that XNA code would immediately dereference.
-        lookupIsNull_ = effect_->getParametersProperty()["World"] == nullptr;
+        worldFound_ = effect_->getParametersProperty()["World"] != nullptr;
+        // The remaining trap, exercised rather than described: a by-name
+        // lookup of an undeclared name, which code would dereference.
+        missingIsNull_ = effect_->getParametersProperty()["NoSuchName"] == nullptr;
 
-        claimHolds_ = parameterCount_ == 0 && techniqueCount_ == 1 && lookupIsNull_;
+        claimHolds_ = parameterCount_ == 21 && techniqueCount_ == 1 &&
+                      currentTechnique_ == "BasicEffect" && worldFound_ && missingIsNull_;
     }
 
     void OnDemoUnload() override { effect_.reset(); }
@@ -72,24 +72,25 @@ protected:
         lines.push_back("  CurrentTechnique      \"" + currentTechnique_ + "\"  passes " +
                         std::to_string(passCount_) + ", annotations " +
                         std::to_string(annotationCount_));
-        lines.push_back("  Parameters[\"World\"]   " +
-                        std::string(lookupIsNull_ ? "nullptr" : "found"));
+        lines.push_back("  Parameters[\"World\"]        " +
+                        std::string(worldFound_ ? "found" : "nullptr"));
+        lines.push_back("  Parameters[\"NoSuchName\"]   " +
+                        std::string(missingIsNull_ ? "nullptr" : "found"));
         lines.emplace_back();
-        lines.push_back("CNA's built-in effects never populate that collection -- their state");
-        lines.push_back("lives in typed C++ fields and property setters instead:");
-        lines.push_back("  effect.World = m;   effect.VertexColorEnabled = true;   (fields)");
+        lines.push_back("As in XNA, the stock effects expose their compiled shader's parameters:");
+        lines.push_back("WorldViewProj, DiffuseColor, DirLight0Direction and the rest.");
         lines.emplace_back();
-        lines.push_back("So this valid XNA line dereferences null here -- the lookup returns");
-        lines.push_back("nullptr and does NOT throw, so it must be checked:");
-        lines.push_back("  effect.Parameters[\"WorldViewProj\"]->SetValue(m);");
+        lines.push_back("A name the effect does not declare returns nullptr and does NOT");
+        lines.push_back("throw, so this line must be checked first:");
+        lines.push_back("  effect.Parameters[\"NoSuchName\"]->SetValue(m);");
         const Vector2 end = DrawLines(sb, font, Vector2(40.0f, 82.0f), lines, tint);
 
         DrawVerdict(sb, font, end.Y + 6.0f,
                     mul(claimHolds_ ? Color(40, 200, 90, 255) : Color(230, 170, 40, 255),
                         TransitionAlpha()),
                     tint,
-                    claimHolds_ ? "Verified live: 0 parameters, 1 technique, null name lookup."
-                                : "This backend reports something else -- numbers above are live.");
+                    claimHolds_ ? "Verified live: 21 parameters, 1 technique, null for a missing name."
+                                : "This renderer reports something else -- numbers above are live.");
     }
 
 private:
@@ -99,7 +100,8 @@ private:
     int techniqueCount_ = 0;
     int passCount_ = 0;
     int annotationCount_ = 0;
-    bool lookupIsNull_ = false;
+    bool worldFound_ = false;
+    bool missingIsNull_ = false;
     bool claimHolds_ = false;
 };
 

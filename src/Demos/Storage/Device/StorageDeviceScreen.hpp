@@ -65,7 +65,7 @@ protected:
             lines.push_back("  TotalSpace:  " + FormatBytes(device_->getTotalSpaceProperty()));
         }
         lines.emplace_back();
-        lines.push_back("Where saves actually go (NOXNA extensions):");
+        lines.push_back("Where saves actually go (CNAEXT extensions):");
         lines.push_back("  SetAppNameEXT(\"" + std::string(kAppName) + "\")");
         lines.push_back("  GetStorageRootEXT() = " +
                         Microsoft::Xna::Framework::Storage::StorageDevice::GetStorageRootEXT());

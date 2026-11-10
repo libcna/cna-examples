@@ -15,7 +15,7 @@ using namespace CnaExamples::GameStateManagement;
 using Microsoft::Xna::Framework::Input::Mouse;
 using Microsoft::Xna::Framework::Input::MouseState;
 
-// Demonstrates MouseState::GetScrollWheelValueProperty() and the NOXNA/EXT
+// Demonstrates MouseState::GetScrollWheelValueProperty() and the CNAEXT/EXT
 // horizontal counterpart: both are CUMULATIVE since the game started (the
 // same XNA convention KeyboardState avoids for keys), so a game normally
 // diffs against the previous frame's value to get a per-frame delta -- this

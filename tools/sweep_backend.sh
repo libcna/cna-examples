@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: MIT
 #
-# Sweep a NON-default build tree, e.g. the SDL_RENDERER one. tools/sweep.sh
-# always uses build/; this takes the tree as its first argument so a second
-# backend can be verified without disturbing the primary build.
+# Sweep a NON-default build tree, e.g. an SDLGPU one. tools/sweep.sh always
+# uses build/; this takes the tree as its first argument so a second renderer
+# can be verified without disturbing the primary build.
 #
 # Usage:
-#   tools/sweep_backend.sh build-sdlrenderer            # every demo
-#   tools/sweep_backend.sh build-sdlrenderer "3D "      # only matching demos
-#   OUT=/tmp/shots tools/sweep_backend.sh build-sdlrenderer
+#   tools/sweep_backend.sh build-sdlgpu            # every demo
+#   tools/sweep_backend.sh build-sdlgpu "3D "      # only matching demos
+#   OUT=/tmp/shots tools/sweep_backend.sh build-sdlgpu
 #
 # Exit status is non-zero if any demo failed to produce a screenshot.
 
@@ -33,7 +33,7 @@ OUT="${OUT:-$BUILD/screenshots}"
 
 if [[ ! -x "$BUILD/cna_examples" ]]; then
     echo "no cna_examples in $BUILD -- configure and build it first, e.g.:" >&2
-    echo "  cmake -S . -B $BUILD_DIR -DCNA_GRAPHICS_RENDERER=SDL_RENDERER \\" >&2
+    echo "  cmake -S . -B $BUILD_DIR -DCNA_GRAPHICS_RENDERER=SDLGPU \\" >&2
     echo "    -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_COMPILER_LAUNCHER=ccache" >&2
     echo "  cmake --build $BUILD_DIR --parallel --target cna_examples" >&2
     exit 1
