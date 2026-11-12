@@ -31,8 +31,10 @@ protected:
         lastDeltaV_ = current.getScrollWheelValueProperty() - previous_.getScrollWheelValueProperty();
         lastDeltaH_ = current.getHorizontalScrollWheelValueEXTProperty() -
                      previous_.getHorizontalScrollWheelValueEXTProperty();
-        if (lastDeltaV_ != 0) totalNotchesV_ += lastDeltaV_ / 120;
-        if (lastDeltaH_ != 0) totalNotchesH_ += lastDeltaH_ / 120;
+        // A precision wheel reports fractions of a notch (XNA adds the raw WM_MOUSEWHEEL delta),
+        // so the notch totals keep them instead of dividing each frame's delta as an integer.
+        if (lastDeltaV_ != 0) totalNotchesV_ += lastDeltaV_ / 120.0;
+        if (lastDeltaH_ != 0) totalNotchesH_ += lastDeltaH_ / 120.0;
         previous_ = current;
     }
 
@@ -56,8 +58,8 @@ private:
     MouseState previous_;
     int lastDeltaV_ = 0;
     int lastDeltaH_ = 0;
-    int totalNotchesV_ = 0;
-    int totalNotchesH_ = 0;
+    double totalNotchesV_ = 0.0;
+    double totalNotchesH_ = 0.0;
 };
 
 } // namespace CnaExamples::Demos::Input::MouseDemos

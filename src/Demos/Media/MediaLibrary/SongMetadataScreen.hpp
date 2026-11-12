@@ -25,7 +25,7 @@ using Microsoft::Xna::Framework::Media::Song;
 //
 // The bundled library deliberately contains one untagged .wav next to five
 // fully-tagged .ogg files, so the "no tags -> Name falls back to the filename
-// stem, and Album/Artist/Genre stay null" path is visible rather than described.
+// stem, and Album/Artist/Genre are XNA's Empty objects" path is visible rather than described.
 class SongMetadataScreen : public LibraryDemoScreen {
 public:
     SongMetadataScreen() : LibraryDemoScreen("MediaLibrary: Song Metadata") {}
@@ -63,10 +63,12 @@ protected:
             auto* artist = song->getArtistProperty();
             auto* genre  = song->getGenreProperty();
 
-            const std::string untagged = "(null -- untagged)";
-            lines.push_back("Artist: " + (artist ? artist->getNameProperty() : untagged));
-            lines.push_back("Album:  " + (album ? album->getNameProperty() : untagged) +
-                            "     Genre: " + (genre ? genre->getNameProperty() : untagged));
+            // An untagged song's relationships are XNA's shared Empty objects (named ""), never null.
+            const auto named = [](const auto* item) { return item && !item->getNameProperty().empty(); };
+            const std::string untagged = "(Empty -- untagged)";
+            lines.push_back("Artist: " + (named(artist) ? artist->getNameProperty() : untagged));
+            lines.push_back("Album:  " + (named(album) ? album->getNameProperty() : untagged) +
+                            "     Genre: " + (named(genre) ? genre->getNameProperty() : untagged));
             lines.push_back("Duration " + FormatDuration(song->getDurationProperty()) +
                             " (container probe, no decode)   Track " +
                             std::to_string((int)song->getTrackNumberProperty()));
@@ -76,7 +78,7 @@ protected:
                             "  IsProtected " + (song->getIsProtectedProperty() ? "true" : "false"));
             lines.push_back("Handle: " + ShortenPath(song->getHandle()));
             lines.push_back(std::string("Song.Album is the same object as Albums[...]: ") +
-                            (AlbumIsShared(album) ? "yes" : (album ? "no" : "n/a (null)")));
+                            (AlbumIsShared(album) ? "yes" : (named(album) ? "no" : "n/a (Album.Empty)")));
         }
 
         DrawLines(sb, font, Vector2(40.0f, 82.0f), lines, mul(Color::White, TransitionAlpha()));

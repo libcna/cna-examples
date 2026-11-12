@@ -6,6 +6,7 @@
 #include <vector>
 
 #include "Microsoft/Xna/Framework/Media/MediaPlayer.hpp"
+#include "Microsoft/Xna/Framework/Media/MediaQueue.hpp"
 #include "Microsoft/Xna/Framework/Media/Song.hpp"
 
 #include "Demos/DemoScreen.hpp"
@@ -63,7 +64,11 @@ protected:
         lines.push_back("State: " + std::string(MediaStateName(MediaPlayer::getStateProperty())));
         lines.push_back("PlayPosition: " +
                          std::to_string(MediaPlayer::getPlayPositionProperty().getTotalSecondsProperty()) + "s");
-        lines.push_back("Duration: " + std::to_string(song_->getDurationProperty().getTotalSecondsProperty()) + "s");
+        // Playback decodes into the queue's own copy of the song (XNA's queue item), not into the
+        // caller's Song, whose Duration stays what it was constructed with.
+        const Song* active = MediaPlayer::getQueueProperty().getActiveSongProperty();
+        const auto duration = active ? active->getDurationProperty() : song_->getDurationProperty();
+        lines.push_back("Duration: " + std::to_string(duration.getTotalSecondsProperty()) + "s");
 
         DrawLines(sb, font, Vector2(40.0f, 90.0f), lines, mul(Color::White, TransitionAlpha()));
     }
